@@ -1,0 +1,87 @@
+{
+  "language": "ja",
+  "level": "ADVANCED",
+  "note": "JLPT N2 수준 어휘 10개 — 배치 시험 ADVANCED 레벨 샘플링용",
+  "items": [
+    {
+      "word": "概念",
+      "reading": "がいねん",
+      "meaning_ko": "개념",
+      "example_ja": "この概念を理解するには時間がかかる。",
+      "example_ko": "이 개념을 이해하려면 시간이 걸린다.",
+      "tags": ["noun", "abstract", "N2"]
+    },
+    {
+      "word": "矛盾",
+      "reading": "むじゅん",
+      "meaning_ko": "모순",
+      "example_ja": "その意見には矛盾が含まれている。",
+      "example_ko": "그 의견에는 모순이 포함되어 있다.",
+      "tags": ["noun", "abstract", "N2"]
+    },
+    {
+      "word": "倫理",
+      "reading": "りんり",
+      "meaning_ko": "윤리",
+      "example_ja": "AIの倫理について議論が続いている。",
+      "example_ko": "AI의 윤리에 대해 논의가 계속되고 있다.",
+      "tags": ["noun", "abstract", "N2"]
+    },
+    {
+      "word": "哲学",
+      "reading": "てつがく",
+      "meaning_ko": "철학",
+      "example_ja": "大学で哲学を専攻しています。",
+      "example_ko": "대학에서 철학을 전공하고 있습니다.",
+      "tags": ["noun", "academic", "N2"]
+    },
+    {
+      "word": "本質",
+      "reading": "ほんしつ",
+      "meaning_ko": "본질",
+      "example_ja": "問題の本質を見極めることが重要だ。",
+      "example_ko": "문제의 본질을 파악하는 것이 중요하다.",
+      "tags": ["noun", "abstract", "N2"]
+    },
+    {
+      "word": "複雑",
+      "reading": "ふくざつ",
+      "meaning_ko": "복잡함",
+      "example_ja": "この問題は非常に複雑だ。",
+      "example_ko": "이 문제는 매우 복잡하다.",
+      "tags": ["adjective", "general", "N2"]
+    },
+    {
+      "word": "批判",
+      "reading": "ひはん",
+      "meaning_ko": "비판",
+      "example_ja": "その政策に対して批判が集まっている。",
+      "example_ko": "그 정책에 대해 비판이 쏟아지고 있다.",
+      "tags": ["noun", "society", "N2"]
+    },
+    {
+      "word": "把握",
+      "reading": "はあく",
+      "meaning_ko": "파악",
+      "example_ja": "現状を把握してから対策を立てます。",
+      "example_ko": "현황을 파악하고 나서 대책을 세웁니다.",
+      "tags": ["noun", "general", "N2"]
+    },
+    {
+      "word": "普遍",
+      "reading": "ふへん",
+      "meaning_ko": "보편",
+      "example_ja": "人権は普遍的な価値だと考えられている。",
+      "example_ko": "인권은 보편적인 가치라고 여겨지고 있다.",
+      "tags": ["noun", "abstract", "N2"]
+    },
+    {
+      "word": "抽象",
+      "reading": "ちゅうしょう",
+      "meaning_ko": "추상",
+      "example_ja": "この絵は抽象的な表現が多い。",
+      "example_ko": "이 그림은 추상적인 표현이 많다.",
+      "tags": ["noun", "abstract", "N2"]
+    }
+  ]
+}

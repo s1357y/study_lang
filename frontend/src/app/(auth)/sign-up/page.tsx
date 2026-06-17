@@ -21,7 +21,8 @@ export default function SignUpPage() {
       submitLabel="회원가입"
       onSubmit={async (email, password) => {
         await register(email, password);
-        router.replace("/dashboard");
+        // 신규 가입 → 배치 시험으로 이동
+        router.replace("/placement");
       }}
       footer={
         <span>

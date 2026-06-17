@@ -16,7 +16,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1.routes import auth, content, health, motivation, study
+from app.api.v1.routes import auth, content, health, motivation, placement, study
 from app.core.config import settings
 from app.core.logging import configure_logging
 from app.core.migration import run_migrations
@@ -57,6 +57,7 @@ def create_app() -> FastAPI:
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
     app.include_router(content.router, prefix="/api/v1/content", tags=["content"])
     app.include_router(study.router, prefix="/api/v1/study", tags=["study"])
+    app.include_router(placement.router, prefix="/api/v1/placement", tags=["placement"])
     app.include_router(motivation.router, prefix="/api/v1/motivation", tags=["motivation"])
 
     # 호환용 루트 헬스 — 로드밸런서/CI probe 용

@@ -10,7 +10,7 @@ seed 데이터는 JLPT N5 수준 어휘 10개로, Ollama 없이도 기본 동작
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from typing import Any
 from uuid import UUID
 
@@ -55,7 +55,7 @@ async def _save_seed_items(
 
     # 없는 항목만 삽입
     saved: list[ContentItem] = []
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     for vocab in _SEED_VOCABULARY:
         if vocab["word"] in existing_words:
             continue

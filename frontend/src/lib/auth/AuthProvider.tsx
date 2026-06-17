@@ -34,6 +34,7 @@ type AuthContextValue = {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (user: UserPublic) => void;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -82,8 +83,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.replace("/sign-in");
   }, [router]);
 
+  const updateUser = useCallback((user: UserPublic) => {
+    setState({ status: "authenticated", user });
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ state, login, register, logout }}>
+    <AuthContext.Provider value={{ state, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

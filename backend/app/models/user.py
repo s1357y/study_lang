@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, String, func
+from sqlalchemy import Boolean, DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -32,6 +32,10 @@ class User(Base):
     # 학습 메타 — MVP 는 일본어 기본
     target_language: Mapped[str] = mapped_column(String(8), nullable=False, default="ja")
     level: Mapped[str] = mapped_column(String(32), nullable=False, default="BEGINNER")
+    # 배치 시험을 한 번이라도 완료(또는 건너뜀)했는지 여부
+    placement_done: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
 
     # 타임스탬프 — DB 측 기본값을 사용해 INSERT 시 자동 채움
     created_at: Mapped[datetime] = mapped_column(

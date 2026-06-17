@@ -26,3 +26,17 @@ async def create(db: AsyncSession, *, email: str, password_hash: str) -> User:
     db.add(user)
     await db.flush()
     return user
+
+
+async def update_level(db: AsyncSession, *, user: User, level: str) -> User:
+    # 배치 시험 결과로 레벨 갱신 — commit 은 서비스 계층에서
+    user.level = level
+    await db.flush()
+    return user
+
+
+async def mark_placement_done(db: AsyncSession, *, user: User) -> User:
+    # 배치 시험 완료(제출 또는 건너뛰기) 기록 — commit 은 서비스 계층에서
+    user.placement_done = True
+    await db.flush()
+    return user

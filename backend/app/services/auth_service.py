@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -66,7 +66,7 @@ async def _issue_pair(
     refresh_token, jti_str = encode_refresh(str(user_id), family_id=str(family_id))
     jti = UUID(jti_str)
     # expires_at 은 encode_refresh 가 이미 알고 있는 TTL 로 직접 계산 (re-decode 불필요)
-    expires_at = datetime.now(timezone.utc) + timedelta(seconds=settings.jwt_refresh_ttl_seconds)
+    expires_at = datetime.now(UTC) + timedelta(seconds=settings.jwt_refresh_ttl_seconds)
 
     # DB 에 해시만 기록 — 평문 토큰은 응답에만 실어 보냄
     await refresh_token_repo.create(
@@ -164,7 +164,7 @@ async def refresh(db: AsyncSession, *, refresh_token: str) -> tuple[User, TokenP
         raise AuthError("Refresh token already used", code="reuse_detected")
 
     # 5) 만료 확인 — exp 클레임은 decode 시 검증되지만 DB 측 expires_at 도 한번 더
-    if row.expires_at <= datetime.now(timezone.utc):
+    if row.expires_at <= datetime.now(UTC):
         raise AuthError("Refresh token expired", code="refresh_expired")
 
     # 6) 사용자 조회 — 응답에 user 정보를 함께 실어 프론트 부팅에 활용

@@ -3,6 +3,7 @@
 흐름:
 - create: 새 시도 기록 삽입 후 flush
 - get_recent_response_times: FSRS rating 결정을 위한 최근 응답시간 목록
+- get_by_problem_ids: problem_id 별 최신 시도 1건 조회 (복습 화면용)
 """
 
 from __future__ import annotations
@@ -39,6 +40,29 @@ async def create(
     db.add(log)
     await db.flush()
     return log
+
+
+async def get_by_problem_ids(
+    db: AsyncSession,
+    *,
+    user_id: UUID,
+    problem_ids: list[UUID],
+) -> dict[UUID, AttemptLog]:
+    # DISTINCT ON (problem_id) — created_at 내림차순 최신 1건씩 반환
+    # MAX(created_at) JOIN 보다 동시성 충돌 시 중복 반환 위험이 없음 (PostgreSQL 전용)
+    if not problem_ids:
+        return {}
+    stmt = (
+        select(AttemptLog)
+        .distinct(AttemptLog.problem_id)
+        .where(
+            AttemptLog.user_id == user_id,
+            AttemptLog.problem_id.in_(problem_ids),
+        )
+        .order_by(AttemptLog.problem_id, AttemptLog.created_at.desc())
+    )
+    result = await db.execute(stmt)
+    return {row.problem_id: row for row in result.scalars().all()}
 
 
 async def get_recent_response_times(

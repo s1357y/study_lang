@@ -12,7 +12,7 @@ auth_service.py 가 이 모듈의 함수를 조합해 사용한다.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, UTC
 from typing import Any
 from uuid import uuid4
 
@@ -77,7 +77,7 @@ class RefreshClaims:
 
 
 def _now_utc() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def encode_access(user_id: str) -> str:

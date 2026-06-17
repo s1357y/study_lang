@@ -24,6 +24,7 @@ class UserPublic(BaseModel):
     email: EmailStr
     target_language: str
     level: str
+    placement_done: bool
 
     model_config = {"from_attributes": True}
 

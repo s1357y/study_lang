@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from uuid import UUID
 
 from sqlalchemy import select, update
@@ -52,7 +52,7 @@ async def revoke(
     await db.execute(
         update(RefreshToken)
         .where(RefreshToken.id == jti, RefreshToken.revoked_at.is_(None))
-        .values(revoked_at=datetime.now(timezone.utc), revoked_reason=reason)
+        .values(revoked_at=datetime.now(UTC), revoked_reason=reason)
     )
 
 
@@ -66,7 +66,7 @@ async def revoke_family(
     result = await db.execute(
         update(RefreshToken)
         .where(RefreshToken.family_id == family_id, RefreshToken.revoked_at.is_(None))
-        .values(revoked_at=datetime.now(timezone.utc), revoked_reason=reason)
+        .values(revoked_at=datetime.now(UTC), revoked_reason=reason)
     )
     return result.rowcount or 0
 

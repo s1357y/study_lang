@@ -8,7 +8,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from uuid import UUID
 
 from sqlalchemy import select
@@ -75,7 +75,7 @@ def update_tag_stats(
 ) -> None:
     # JSONB 내부 변경은 SQLAlchemy 가 감지 못하므로 직접 수정 후 flag_modified 필수
     stats: dict = dict(profile.tag_stats)  # 얕은 복사로 새 dict 참조 생성
-    now_iso = datetime.now(timezone.utc).isoformat()
+    now_iso = datetime.now(UTC).isoformat()
 
     for tag in tags:
         entry = stats.get(tag, {"seen": 0, "wrong": 0, "last_wrong_at": None})

@@ -26,6 +26,7 @@ export type UserPublic = {
   email: string;
   target_language: string;
   level: string;
+  placement_done: boolean;
 };
 
 export type TokenResponse = {
@@ -181,7 +182,17 @@ export async function authLogin(
 }
 
 // 부팅 시 호출 — refresh 쿠키가 있으면 access 복구
+// React Strict Mode 의 useEffect 이중 실행 방어: 동시 호출을 하나의 Promise 로 합침
+let inflightBootstrap: Promise<TokenResponse | null> | null = null;
+
 export async function authBootstrap(): Promise<TokenResponse | null> {
+  inflightBootstrap ??= _doBootstrap().finally(() => {
+    inflightBootstrap = null;
+  });
+  return inflightBootstrap;
+}
+
+async function _doBootstrap(): Promise<TokenResponse | null> {
   try {
     const data = await request<TokenResponse>("/api/v1/auth/refresh", {
       method: "POST",
@@ -300,4 +311,96 @@ export type MotivationState = {
 
 export async function fetchMotivation(): Promise<MotivationState> {
   return request<MotivationState>("/api/v1/motivation");
+}
+
+// ============================================================================
+// 배치 시험 도메인 타입
+// ============================================================================
+
+export type PlacementProblem = {
+  problem_id: string;
+  content_item_id: string;
+  problem_type: string;
+  prompt: string;
+  answer: string;
+  distractors: string[];
+  tags: string[];
+};
+
+export type PlacementProblemsResponse = {
+  problems: PlacementProblem[];
+  total: number;
+  placement_token: string;
+};
+
+export type PlacementResult = {
+  assigned_level: string;
+  level_label: string;
+  message: string;
+};
+
+// ============================================================================
+// 배치 시험 도메인 함수
+// ============================================================================
+
+export async function fetchPlacementProblems(): Promise<PlacementProblemsResponse> {
+  return request<PlacementProblemsResponse>("/api/v1/placement/problems");
+}
+
+export async function submitPlacement(body: {
+  placement_token: string;
+  answers: Record<string, boolean>;
+}): Promise<PlacementResult> {
+  return request<PlacementResult>("/api/v1/placement/submit", {
+    method: "POST",
+    body,
+  });
+}
+
+export async function skipPlacement(): Promise<void> {
+  return request<void>("/api/v1/placement/skip", { method: "POST" });
+}
+
+// ============================================================================
+// 학습 복습 도메인 타입
+// ============================================================================
+
+export type ReviewItem = {
+  problem_id: string;
+  content_item_id: string;
+  problem_type: string;
+  prompt: string;
+  answer: string;
+  tags: string[];
+  payload: {
+    word?: string;
+    reading?: string;
+    meaning_ko?: string;
+    example_ja?: string;
+    example_ko?: string;
+  };
+  my_correct: boolean | null;
+  my_rating: string | null;
+  attempted_at: string | null;
+};
+
+export type SessionSummary = {
+  id: string;
+  date: string;
+  completed_count: number;
+  total_count: number;
+  started_at: string;
+  finished_at: string | null;
+};
+
+// ============================================================================
+// 학습 복습 도메인 함수
+// ============================================================================
+
+export async function fetchRecentSessions(limit = 7): Promise<SessionSummary[]> {
+  return request<SessionSummary[]>(`/api/v1/study/sessions?limit=${limit}`);
+}
+
+export async function fetchSessionReview(date: string): Promise<ReviewItem[]> {
+  return request<ReviewItem[]>(`/api/v1/study/sessions/${date}/review`);
 }

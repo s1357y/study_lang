@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { MotivationPanel } from "@/features/motivation/components/MotivationPanel";
 import { useStudyStats } from "@/features/study/hooks/useStudyStats";
+import { useAuth } from "@/lib/auth/AuthProvider";
 
 function StatBadge({ label, value }: { label: string; value: number }) {
   return (
@@ -18,14 +19,35 @@ function StatBadge({ label, value }: { label: string; value: number }) {
 
 export default function DashboardPage() {
   const { data: stats, isLoading, error } = useStudyStats();
+  const { state } = useAuth();
 
+  const user = state.status === "authenticated" ? state.user : null;
   const hasItems =
     stats !== undefined &&
     (stats.due_today > 0 || stats.new_available > 0);
 
+  // 오늘 날짜 UTC 기준
+  const todayDate = new Date().toISOString().slice(0, 10);
+
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-bold">대시보드</h1>
+
+      {/* 배치 시험 CTA — placement_done=false 인 경우만 표시 */}
+      {user && !user.placement_done && (
+        <section className="rounded-2xl border border-blue-100 bg-blue-50 p-5">
+          <h2 className="text-sm font-semibold text-blue-800">레벨 파악이 필요해요</h2>
+          <p className="mt-1 text-xs text-blue-600">
+            배치 시험을 통해 나에게 맞는 레벨로 시작하세요.
+          </p>
+          <Link
+            href="/placement"
+            className="mt-3 inline-block rounded-xl bg-blue-700 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-800"
+          >
+            배치 시험 보기 →
+          </Link>
+        </section>
+      )}
 
       {/* 오늘의 학습 현황 */}
       <section className="rounded-2xl border border-neutral-200 bg-white p-6">
@@ -48,15 +70,25 @@ export default function DashboardPage() {
               <StatBadge label="신규" value={stats.new_available} />
             </div>
 
-            {hasItems ? (
+            <div className="mt-5 flex gap-2">
+              {hasItems && (
+                <Link
+                  href="/study"
+                  className="rounded-xl bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-neutral-700"
+                >
+                  학습 시작 →
+                </Link>
+              )}
               <Link
-                href="/study"
-                className="mt-5 inline-block rounded-xl bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-neutral-700"
+                href={`/study/review/${todayDate}`}
+                className="rounded-xl border border-neutral-200 px-5 py-2.5 text-sm font-medium text-neutral-700 hover:border-neutral-400"
               >
-                학습 시작 →
+                오늘 복습하기
               </Link>
-            ) : (
-              <p className="mt-4 text-sm text-neutral-500">
+            </div>
+
+            {!hasItems && (
+              <p className="mt-3 text-sm text-neutral-500">
                 오늘 학습할 항목이 없습니다. 내일 다시 확인하세요.
               </p>
             )}

@@ -1,11 +1,11 @@
-"""콘텐츠 시딩 스크립트 — seeds/vocabulary_n5.json 을 DB 에 INSERT 한다.
+"""콘텐츠 시딩 스크립트 — seeds/vocabulary_*.json 을 DB 에 INSERT 한다.
 
 실행:
     cd backend
-    python -m scripts.seed_content [--level BEGINNER] [--dry-run]
+    python -m scripts.seed_content [--level BEGINNER|ELEMENTARY|INTERMEDIATE|ADVANCED] [--dry-run]
 
 동작:
-    1) seeds/vocabulary_n5.json 로드
+    1) --level 에 해당하는 seeds/*.json 로드
     2) content_repo.get_seeds() 로 기존 seed 확인 (중복 방지)
     3) 없는 항목만 ContentItem INSERT (source="seed")
     4) MCQ_MEANING 필수 / MCQ_READING 한자 있을 때 / FILL_BLANK 단독 출현 때
@@ -34,7 +34,12 @@ from app.repositories import content_repo  # noqa: E402
 
 logger = get_logger("seed_content")
 
-_SEEDS_FILE = _BACKEND / "seeds" / "vocabulary_n5.json"
+_LEVEL_TO_FILE = {
+    "BEGINNER": _BACKEND / "seeds" / "vocabulary_n5.json",
+    "ELEMENTARY": _BACKEND / "seeds" / "vocabulary_n4.json",
+    "INTERMEDIATE": _BACKEND / "seeds" / "vocabulary_n3.json",
+    "ADVANCED": _BACKEND / "seeds" / "vocabulary_n2.json",
+}
 
 # generation_service._find_standalone_word 와 동일 패턴 — CJK 한자 경계 판단
 _CJK_RE = re.compile(r"[一-鿿]")
@@ -72,7 +77,8 @@ def _find_standalone_idx(word: str, text: str) -> int:
 
 
 async def run(*, level: str, dry_run: bool) -> None:
-    raw = json.loads(_SEEDS_FILE.read_text(encoding="utf-8"))
+    seeds_file = _LEVEL_TO_FILE[level]
+    raw = json.loads(seeds_file.read_text(encoding="utf-8"))
     items: list[dict] = raw["items"]
     logger.info("seeds 파일 로드: %d개 (level=%s)", len(items), level)
 
@@ -96,8 +102,9 @@ async def run(*, level: str, dry_run: bool) -> None:
             if dry_run:
                 n_problems += _count_problems(v)
                 n_items += 1
-                logger.info("[DRY-RUN] %s (%s) → Problem %d개",
-                            word, v["reading"], _count_problems(v))
+                logger.info(
+                    "[DRY-RUN] %s (%s) → Problem %d개", word, v["reading"], _count_problems(v)
+                )
                 continue
 
             # ContentItem 생성 (flush 만)
@@ -128,7 +135,7 @@ async def run(*, level: str, dry_run: bool) -> None:
                 problem_type=ProblemType.MCQ_MEANING,
                 prompt=f"{word}（{v['reading']}）의 의미는?",
                 answer=v["meaning_ko"],
-                distractors=None,   # study_service 가 런타임에 같은 레벨 풀에서 채움
+                distractors=None,  # study_service 가 런타임에 같은 레벨 풀에서 채움
                 tags=item_tags,
                 meta={},
             )
@@ -151,11 +158,7 @@ async def run(*, level: str, dry_run: bool) -> None:
             # FILL_BLANK — 사전형이 예문에 단독으로 출현할 때만
             idx = _find_standalone_idx(word, v["example_ja"])
             if idx != -1:
-                blank = (
-                    v["example_ja"][:idx]
-                    + "＿＿＿"
-                    + v["example_ja"][idx + len(word):]
-                )
+                blank = v["example_ja"][:idx] + "＿＿＿" + v["example_ja"][idx + len(word) :]
                 await content_repo.create_problem(
                     db,
                     content_item_id=item.id,
@@ -177,7 +180,10 @@ async def run(*, level: str, dry_run: bool) -> None:
     prefix = "[DRY-RUN] " if dry_run else ""
     logger.info(
         "%s시딩 완료: ContentItem=%d Problem=%d 스킵=%d",
-        prefix, n_items, n_problems, n_skip,
+        prefix,
+        n_items,
+        n_problems,
+        n_skip,
     )
 
 

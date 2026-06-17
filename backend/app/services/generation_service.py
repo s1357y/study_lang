@@ -13,7 +13,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
@@ -85,7 +85,7 @@ async def generate_vocabulary(
 
     # 4) 검증 + DB 저장
     saved: list[ContentItem] = []
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     for vocab in batch.items:
         if not validate_vocabulary_output(vocab):

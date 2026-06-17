@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, Float, Index, String, Text, func
+from sqlalchemy import DateTime, Float, Index, String, func
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -54,7 +54,7 @@ class ContentItem(Base):
     )
 
     # 이 ContentItem 으로 만들어진 문제들
-    problems: Mapped[list["Problem"]] = relationship(
+    problems: Mapped[list[Problem]] = relationship(
         "Problem", back_populates="content_item", cascade="all, delete-orphan"
     )
 

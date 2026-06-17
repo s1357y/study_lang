@@ -1,12 +1,16 @@
-"""Study 서비스 — 오늘 세션 빌드, 시도 제출, 통계 조회.
+"""Study 서비스 — 오늘 세션 빌드, 시도 제출, 통계 조회, 복습.
 
 흐름:
 - build_today_session: 기존 세션 재사용 또는 복습+신규 슬롯으로 신규 세션 생성
 - record_attempt: SRS 갱신 + 약점 기록 + 세션 진행도 갱신 + DB commit
 - get_stats: 오늘 due 수 / 신규 가능 수 / 약점 태그 반환
+- get_session_review: 날짜별 완료 문제 복습 카드 목록
+- get_recent_sessions: 최근 세션 요약 목록
 
 에러:
 - StudyError(code="not_found"): 존재하지 않는 Problem ID 제출 시
+- StudyError(code="invalid_date"): 날짜 형식 오류 시
+- StudyError(code="session_not_found"): 해당 날짜 세션 없음
 """
 
 from __future__ import annotations
@@ -17,6 +21,7 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.v1.schemas.study import ContentItemPayload, ReviewItemOut, SessionSummaryOut
 from app.core.logging import get_logger
 from app.models.content_item import ContentItem
 from app.models.problem import Problem, ProblemType
@@ -243,3 +248,81 @@ async def get_stats(
     )
     weak_tags = await weakness_service.get_weak_tags(db, user_id=user.id)
     return len(due_records), len(new_items), weak_tags
+
+
+async def get_session_review(
+    db: AsyncSession,
+    *,
+    user_id: UUID,
+    date_str: str,
+) -> list[ReviewItemOut]:
+    """날짜별 완료 문제 복습 카드 목록 반환."""
+    from datetime import date as date_type
+
+    try:
+        target_date = date_type.fromisoformat(date_str)
+    except ValueError as exc:
+        raise StudyError(f"잘못된 날짜 형식: {date_str}", code="invalid_date") from exc
+
+    session = await study_session_repo.get_by_date(db, user_id=user_id, target_date=target_date)
+    if session is None:
+        raise StudyError(f"{date_str} 세션이 없습니다.", code="session_not_found")
+
+    completed_ids = [UUID(pid) for pid in session.completed_problem_ids]
+    if not completed_ids:
+        return []
+
+    problems = await content_repo.get_problems_by_ids(db, completed_ids)
+    problem_map = {p.id: p for p in problems}
+
+    citem_map = await content_repo.get_items_by_ids(db, [p.content_item_id for p in problems])
+
+    attempt_map = await attempt_repo.get_by_problem_ids(
+        db, user_id=user_id, problem_ids=completed_ids
+    )
+
+    items: list[ReviewItemOut] = []
+    for pid in completed_ids:
+        problem = problem_map.get(pid)
+        if problem is None:
+            continue
+        ci = citem_map.get(problem.content_item_id)
+        if ci is None:
+            continue
+        attempt = attempt_map.get(pid)
+        items.append(
+            ReviewItemOut(
+                problem_id=problem.id,
+                content_item_id=problem.content_item_id,
+                problem_type=problem.type.value,
+                prompt=problem.prompt,
+                answer=problem.answer,
+                tags=problem.tags,
+                payload=ContentItemPayload(**ci.payload),
+                my_correct=attempt.correct if attempt else None,
+                my_rating=attempt.rating if attempt else None,
+                attempted_at=attempt.created_at if attempt else None,
+            )
+        )
+    return items
+
+
+async def get_recent_sessions(
+    db: AsyncSession,
+    *,
+    user_id: UUID,
+    limit: int = 7,
+) -> list[SessionSummaryOut]:
+    """최근 세션 요약 목록 반환."""
+    sessions = await study_session_repo.get_recent(db, user_id=user_id, limit=limit)
+    return [
+        SessionSummaryOut(
+            id=s.id,
+            date=s.date,
+            completed_count=len(s.completed_problem_ids),
+            total_count=len(s.planned_problem_ids),
+            started_at=s.started_at,
+            finished_at=s.finished_at,
+        )
+        for s in sessions
+    ]

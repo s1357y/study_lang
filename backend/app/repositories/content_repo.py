@@ -187,6 +187,30 @@ async def get_items_by_ids(
     return {ci.id: ci for ci in result.scalars().all()}
 
 
+async def get_problems_for_placement(
+    db: AsyncSession,
+    *,
+    language: str = "ja",
+    level: str,
+    problem_type: ProblemType = ProblemType.MCQ_MEANING,
+    limit: int = 3,
+) -> list[Problem]:
+    # Problem JOIN ContentItem 으로 레벨 필터 + random 샘플링
+    stmt = (
+        select(Problem)
+        .join(ContentItem, Problem.content_item_id == ContentItem.id)
+        .where(
+            ContentItem.language == language,
+            ContentItem.level == level,
+            Problem.type == problem_type,
+        )
+        .order_by(func.random())
+        .limit(limit)
+    )
+    result = await db.execute(stmt)
+    return list(result.scalars().all())
+
+
 async def get_items_by_level_excluding(
     db: AsyncSession,
     *,

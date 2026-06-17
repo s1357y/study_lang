@@ -1,0 +1,87 @@
+{
+  "language": "ja",
+  "level": "INTERMEDIATE",
+  "note": "JLPT N3 수준 어휘 10개 — 배치 시험 INTERMEDIATE 레벨 샘플링용",
+  "items": [
+    {
+      "word": "環境",
+      "reading": "かんきょう",
+      "meaning_ko": "환경",
+      "example_ja": "環境問題は世界中で深刻です。",
+      "example_ko": "환경 문제는 전 세계적으로 심각합니다.",
+      "tags": ["noun", "society", "N3"]
+    },
+    {
+      "word": "経済",
+      "reading": "けいざい",
+      "meaning_ko": "경제",
+      "example_ja": "最近、経済の状況が変わってきた。",
+      "example_ko": "최근 경제 상황이 변해왔다.",
+      "tags": ["noun", "society", "N3"]
+    },
+    {
+      "word": "技術",
+      "reading": "ぎじゅつ",
+      "meaning_ko": "기술",
+      "example_ja": "最新の技術が私たちの生活を変えている。",
+      "example_ko": "최신 기술이 우리의 생활을 바꾸고 있다.",
+      "tags": ["noun", "technology", "N3"]
+    },
+    {
+      "word": "研究",
+      "reading": "けんきゅう",
+      "meaning_ko": "연구",
+      "example_ja": "大学院でAIの研究をしています。",
+      "example_ko": "대학원에서 AI 연구를 하고 있습니다.",
+      "tags": ["noun", "education", "N3"]
+    },
+    {
+      "word": "影響",
+      "reading": "えいきょう",
+      "meaning_ko": "영향",
+      "example_ja": "気候変動は農業に大きな影響を与えている。",
+      "example_ko": "기후 변화는 농업에 큰 영향을 주고 있다.",
+      "tags": ["noun", "general", "N3"]
+    },
+    {
+      "word": "判断",
+      "reading": "はんだん",
+      "meaning_ko": "판단",
+      "example_ja": "状況を見て自分で判断してください。",
+      "example_ko": "상황을 보고 스스로 판단해 주세요.",
+      "tags": ["noun", "general", "N3"]
+    },
+    {
+      "word": "状況",
+      "reading": "じょうきょう",
+      "meaning_ko": "상황",
+      "example_ja": "現在の状況を説明してください。",
+      "example_ko": "현재 상황을 설명해 주세요.",
+      "tags": ["noun", "general", "N3"]
+    },
+    {
+      "word": "解決",
+      "reading": "かいけつ",
+      "meaning_ko": "해결",
+      "example_ja": "この問題の解決策を考えています。",
+      "example_ko": "이 문제의 해결책을 생각하고 있습니다.",
+      "tags": ["noun", "general", "N3"]
+    },
+    {
+      "word": "目的",
+      "reading": "もくてき",
+      "meaning_ko": "목적",
+      "example_ja": "この旅行の目的は何ですか。",
+      "example_ko": "이 여행의 목적은 무엇입니까?",
+      "tags": ["noun", "general", "N3"]
+    },
+    {
+      "word": "可能性",
+      "reading": "かのうせい",
+      "meaning_ko": "가능성",
+      "example_ja": "成功する可能性はまだあります。",
+      "example_ko": "성공할 가능성은 아직 있습니다.",
+      "tags": ["noun", "general", "N3"]
+    }
+  ]
+}

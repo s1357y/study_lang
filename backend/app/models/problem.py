@@ -82,4 +82,4 @@ class Problem(Base):
     # 추가 메타 (생성 파라미터, 모델 버전 등 기록용)
     meta: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
 
-    content_item: Mapped["ContentItem"] = relationship("ContentItem", back_populates="problems")
+    content_item: Mapped[ContentItem] = relationship("ContentItem", back_populates="problems")

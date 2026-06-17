@@ -40,3 +40,38 @@ export type StudyStats = z.infer<typeof StudyStatsSchema>;
 export type ProblemOut = z.infer<typeof ProblemOutSchema>;
 export type StudySession = z.infer<typeof StudySessionSchema>;
 export type AttemptResult = z.infer<typeof AttemptResultSchema>;
+
+// ---------------------------------------------------------------------------
+// 복습(Session Review) 스키마
+// ---------------------------------------------------------------------------
+
+export const ReviewItemSchema = z.object({
+  problem_id: z.string().uuid(),
+  content_item_id: z.string().uuid(),
+  problem_type: z.string(),
+  prompt: z.string(),
+  answer: z.string(),
+  tags: z.array(z.string()),
+  payload: z.object({
+    word: z.string().optional(),
+    reading: z.string().optional(),
+    meaning_ko: z.string().optional(),
+    example_ja: z.string().optional(),
+    example_ko: z.string().optional(),
+  }),
+  my_correct: z.boolean().nullable(),
+  my_rating: z.string().nullable(),
+  attempted_at: z.string().nullable(),
+});
+
+export const SessionSummarySchema = z.object({
+  id: z.string().uuid(),
+  date: z.string(),
+  completed_count: z.number().int().min(0),
+  total_count: z.number().int().min(0),
+  started_at: z.string(),
+  finished_at: z.string().nullable(),
+});
+
+export type ReviewItem = z.infer<typeof ReviewItemSchema>;
+export type SessionSummary = z.infer<typeof SessionSummarySchema>;
