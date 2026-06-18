@@ -55,9 +55,10 @@ uv run python -m scripts.seed_content --level ADVANCED
 uv run python -m scripts.seed_content --level ELEMENTARY --kind grammar
 uv run python -m scripts.seed_content --level INTERMEDIATE --kind grammar
 
-# 6) MCQ_MEANING 오답 보강 (기존 시드 데이터를 의미 기반 오답으로 업그레이드)
-uv run python -m scripts.enrich_mcq_meaning --dry-run   # 대상 확인
-uv run python -m scripts.enrich_mcq_meaning              # 전체 실행
+# 6) MCQ_MEANING 오답 보강 (distractor 풀 6~9개 생성)
+uv run python -m scripts.enrich_mcq_meaning --dry-run    # 대상 확인 (DB 변경 없음)
+uv run python -m scripts.enrich_mcq_meaning               # 전체 실행 (distractors=NULL 대상)
+uv run python -m scripts.enrich_mcq_meaning --upgrade     # 기존 3개짜리 레코드도 포함
 
 # 7) 프론트엔드 실행 (별도 터미널)
 cd frontend
@@ -94,8 +95,9 @@ uv run python -m scripts.seed_content --level BEGINNER --dry-run
 
 ### MCQ_MEANING 오답 선택지 보강
 
-기존 시드/LLM 생성 데이터 중 `distractors`가 없는 MCQ_MEANING 문제에
-의미 기반 오답을 LLM으로 생성해 저장한다. 멱등성 보장(이미 있는 행은 스킵).
+MCQ_MEANING 문제에 의미 유사 오답을 LLM으로 6~9개 생성해 저장한다.
+퀴즈 실행 시 그 중 3개를 `random.sample`로 선택 → 세션마다 다른 조합 노출.
+멱등성 보장: `--upgrade` 없이 실행하면 이미 distractors가 있는 행은 자동 스킵.
 
 ```powershell
 cd backend
@@ -103,12 +105,17 @@ cd backend
 # 대상 목록만 확인 (DB 변경 없음)
 uv run python -m scripts.enrich_mcq_meaning --dry-run
 
-# 전체 레벨 일괄 보강
+# 전체 레벨 일괄 보강 (distractors=NULL 행만)
 uv run python -m scripts.enrich_mcq_meaning
 
 # 특정 레벨만
 uv run python -m scripts.enrich_mcq_meaning --level BEGINNER
 uv run python -m scripts.enrich_mcq_meaning --level ELEMENTARY
+
+# 기존 3개짜리 레코드를 6~9개로 확장 (풀 업그레이드)
+uv run python -m scripts.enrich_mcq_meaning --upgrade --dry-run   # 대상 확인
+uv run python -m scripts.enrich_mcq_meaning --upgrade              # 전체 업그레이드
+uv run python -m scripts.enrich_mcq_meaning --upgrade --level BEGINNER --batch-size 5
 
 # 커밋 단위 조정 (기본 10)
 uv run python -m scripts.enrich_mcq_meaning --batch-size 5
@@ -116,8 +123,8 @@ uv run python -m scripts.enrich_mcq_meaning --batch-size 5
 
 > **언제 실행해야 하나?**  
 > - 초기 시딩 직후: `seed_content` → `enrich_mcq_meaning` 순서로 실행  
-> - 기존 환경에서 Phase 10으로 업그레이드 시: `enrich_mcq_meaning` 한 번 실행  
-> - 신규 LLM 생성 콘텐츠는 자동으로 의미 기반 오답이 저장되므로 별도 실행 불필요
+> - 기존 3개짜리 레코드를 6~9개로 확장하려면: `--upgrade` 플래그 추가  
+> - 신규 LLM 생성 콘텐츠는 자동으로 6~9개 오답이 저장되므로 별도 실행 불필요
 
 ### DB 마이그레이션
 
@@ -195,7 +202,7 @@ npm run dev
 | 7 | 배치 시험 (레벨 자동 배정) + 학습 복습 (날짜별 이력) |
 | 8 | 다중 문제 유형 (MCQ_GRAMMAR·MCQ_CONTEXT·MCQ_SYNONYM) + 문법 콘텐츠 생성 + N2~N5 어휘/문법 시드 |
 | 9 | 학습 세션 연장 + LLM 폴백 + 배치고사 유형 혼합 (5문제×4레벨) + 레벨업 시험 (JLPT 형식, 20문제) |
-| 10 | MCQ_MEANING 오답 품질 개선 (LLM 기반 의미 유사 오답 선저장 + `enrich_mcq_meaning` 보강 스크립트) |
+| 10 | MCQ_MEANING 오답 다양화 — distractor 풀 6~9개 확장 + 세션마다 `random.sample(3)` + `--upgrade` 기존 레코드 재보강 |
 
 ---
 
@@ -210,8 +217,9 @@ npm run dev
 | `seeds/grammar_n4.json` | ELEMENTARY (N4) | 문법 | — |
 | `seeds/grammar_n3.json` | INTERMEDIATE (N3) | 문법 | — |
 
-> Phase 10부터 어휘 시드에 `confusable_meanings` 필드가 포함되어 있어  
-> 시딩 즉시 의미 기반 MCQ_MEANING 오답이 생성됩니다.
+> Phase 10부터 어휘 시드에 `confusable_meanings` 6~9개가 포함되어 있어  
+> 시딩 즉시 의미 기반 MCQ_MEANING 오답이 생성됩니다.  
+> 세션마다 그 중 3개를 `random.sample`로 선택해 매번 다른 조합이 출제됩니다.
 
 ---
 

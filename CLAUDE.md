@@ -9,6 +9,7 @@
 - **도메인 용어 일관성** — 모델명/엔드포인트/UI 모두 통일. (자세히: [`docs/conventions/terminology.md`](./docs/conventions/terminology.md))
 - **CLAUDE.md 는 인덱스, 세부는 분리** — 200줄 미만 유지. 길어지면 `rules/<topic>.md` 로 즉시 분리.
 - **구조 정의는 STRUCTURE.md 부터 본다** — 새 파일 위치는 STRUCTURE.md 의 결정 트리를 따른다.
+- **커밋 전 README.md 현행화** — 커밋 요청 시 변경 내용을 README.md (구현 완료 범위·운영 명령어 등) 에 반영하고 같은 커밋에 포함한다.
 
 ## 아키텍처 단일 출처
 
