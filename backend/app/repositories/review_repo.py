@@ -4,13 +4,14 @@
 - get_or_create: 없으면 NEW 상태로 생성, 동시 삽입 경쟁은 IntegrityError 포착 후 재조회
 - due_today: next_due_at <= now() 인 레코드를 우선순위 정렬로 최대 40개
 - get_new_content_items: 아직 ReviewRecord 가 없는 ContentItem — 신규 학습 슬롯용
+- delete_new_records_for_items: 배치 전 생성된 미학습 ReviewRecord 삭제 (배치 완료 시 정리용)
 """
 
 from __future__ import annotations
 
 from uuid import UUID
 
-from sqlalchemy import case, func, select
+from sqlalchemy import case, delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -79,9 +80,7 @@ async def get_new_content_items(
     limit: int,
 ) -> list[ContentItem]:
     # 해당 사용자의 ReviewRecord 가 없는 ContentItem 만 조회 (신규 학습용)
-    already_reviewed = select(ReviewRecord.content_item_id).where(
-        ReviewRecord.user_id == user_id
-    )
+    already_reviewed = select(ReviewRecord.content_item_id).where(ReviewRecord.user_id == user_id)
     stmt = (
         select(ContentItem)
         .where(
@@ -93,3 +92,23 @@ async def get_new_content_items(
     )
     result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+async def delete_new_records_for_items(
+    db: AsyncSession,
+    *,
+    user_id: UUID,
+    content_item_ids: list[UUID],
+) -> int:
+    """배치 전 생성된 미학습 ReviewRecord 삭제. 실제 학습 진행분(reps>0)은 건드리지 않는다."""
+    if not content_item_ids:
+        return 0
+    stmt = delete(ReviewRecord).where(
+        ReviewRecord.user_id == user_id,
+        ReviewRecord.content_item_id.in_(content_item_ids),
+        ReviewRecord.state == "NEW",
+        ReviewRecord.last_reviewed_at.is_(None),
+        ReviewRecord.reps == 0,
+    )
+    result = await db.execute(stmt)
+    return result.rowcount

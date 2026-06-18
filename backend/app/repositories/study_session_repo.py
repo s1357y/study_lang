@@ -81,6 +81,20 @@ async def get_recent(
     return list(result.scalars().all())
 
 
+async def delete_today(
+    db: AsyncSession,
+    *,
+    user_id: UUID,
+    today_date: date,
+) -> StudySession | None:
+    """오늘 날짜 세션 삭제. 삭제된 세션 반환(없으면 None)."""
+    existing = await get_today(db, user_id=user_id, today_date=today_date)
+    if existing is None:
+        return None
+    await db.delete(existing)
+    return existing
+
+
 def add_completed(session: StudySession, *, problem_id: UUID) -> None:
     # 리스트 재할당으로 SQLAlchemy ARRAY dirty 플래그 트리거
     session.completed_problem_ids = session.completed_problem_ids + [str(problem_id)]

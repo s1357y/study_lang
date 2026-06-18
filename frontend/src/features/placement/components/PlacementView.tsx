@@ -54,8 +54,10 @@ export function PlacementView() {
     setIsSkipping(true);
     try {
       await skipPlacement();
-    } finally {
       router.replace("/dashboard");
+    } catch {
+      // API 실패 시 버튼 복원 — redirect 하지 않음
+      setIsSkipping(false);
     }
   }
 
@@ -113,7 +115,7 @@ export function PlacementView() {
         <div className="mb-2 h-1.5 w-full overflow-hidden rounded-full bg-neutral-100">
           <div
             className="h-full rounded-full bg-neutral-900 transition-all"
-            style={{ width: `${((currentIndex) / data.total) * 100}%` }}
+            style={{ width: `${((currentIndex + 1) / data.total) * 100}%` }}
           />
         </div>
         {submitMutation.isPending ? (

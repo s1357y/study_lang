@@ -145,6 +145,22 @@ async def _build_exam_distractors(
         opts = (problem.distractors or {}).get("options", [])
         return random.sample(opts, 3) if len(opts) > 3 else opts
 
+    # FILL_BLANK: 같은 레벨 vocabulary 풀에서 word 값 기준으로 오답 3개 동적 추출
+    if problem.type == ProblemType.FILL_BLANK:
+        pool = await content_repo.get_items_by_level_excluding(
+            db, level=level, exclude_id=problem.content_item_id, kind="vocabulary", limit=20
+        )
+        seen: set[str] = {problem.answer}
+        distractors: list[str] = []
+        for ci in pool:
+            word = ci.payload.get("word", "")
+            if word and word not in seen:
+                seen.add(word)
+                distractors.append(word)
+            if len(distractors) >= 3:
+                break
+        return distractors
+
     if problem.type not in (ProblemType.MCQ_MEANING, ProblemType.MCQ_READING):
         return []
 

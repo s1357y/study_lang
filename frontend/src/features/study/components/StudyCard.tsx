@@ -10,7 +10,7 @@ import type { ProblemOut } from "../types";
 const PROMPT_LABEL: Record<string, string> = {
   mcq_meaning: "의미를 고르세요",
   mcq_reading: "읽기를 고르세요",
-  fill_blank: "빈칸을 채우세요",
+  fill_blank: "빈칸에 알맞은 단어를 고르세요",
   short_answer: "답을 입력하세요",
   translation: "번역하세요",
   listening: "들은 내용을 입력하세요",
@@ -23,6 +23,7 @@ const PROMPT_LABEL: Record<string, string> = {
 const MCQ_TYPES = new Set([
   "mcq_meaning",
   "mcq_reading",
+  "fill_blank",
   "mcq_grammar",
   "mcq_context",
   "mcq_synonym",
@@ -44,9 +45,10 @@ function shuffleChoices(answer: string, distractors: string[]): string[] {
 }
 
 function renderPrompt(text: string): React.ReactNode {
-  // ___ 구간을 시각적으로 강조 (MCQ_GRAMMAR, MCQ_CONTEXT 빈칸 표시)
-  if (!text.includes("___")) return <>{text}</>;
-  const parts = text.split("___");
+  // 전각 언더스코어(＿+)를 ASCII(___) 로 정규화해 빈칸 표시를 공통 처리
+  const normalized = text.replace(/＿+/g, "___");
+  if (!normalized.includes("___")) return <>{text}</>;
+  const parts = normalized.split("___");
   return (
     <>
       {parts.map((part, i, arr) => (

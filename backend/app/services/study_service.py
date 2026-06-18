@@ -104,6 +104,23 @@ def _select_distractors(
     return candidates
 
 
+def _select_fill_blank_distractors(
+    problem: Problem,
+    pool: list[ContentItem],
+) -> list[str]:
+    """FILL_BLANK 오답 선택지 3개 반환 — 같은 레벨 어휘의 word 값 기준."""
+    seen: set[str] = {problem.answer}
+    distractors: list[str] = []
+    for ci in pool:
+        w = ci.payload.get("word", "")
+        if w and w not in seen:
+            seen.add(w)
+            distractors.append(w)
+        if len(distractors) >= 3:
+            break
+    return distractors
+
+
 async def _build_problems_with_distractors(
     db: AsyncSession,
     content_item_ids: list[UUID],
@@ -138,6 +155,11 @@ async def _build_problems_with_distractors(
                     db, level=item.level, exclude_id=item.id, kind=item.kind, limit=20
                 )
                 distractors = _select_distractors(problem, item, pool)
+        elif problem.type == ProblemType.FILL_BLANK:
+            pool = await content_repo.get_items_by_level_excluding(
+                db, level=item.level, exclude_id=item.id, kind=item.kind, limit=20
+            )
+            distractors = _select_fill_blank_distractors(problem, pool)
 
         result.append(ProblemWithDistractors(problem=problem, distractors=distractors))
         planned_ids.append(str(problem.id))
@@ -179,6 +201,11 @@ async def _reload_session_problems(
                     db, level=item.level, exclude_id=item.id, kind=item.kind, limit=20
                 )
                 distractors = _select_distractors(p, item, pool)
+        elif p.type == ProblemType.FILL_BLANK:
+            pool = await content_repo.get_items_by_level_excluding(
+                db, level=item.level, exclude_id=item.id, kind=item.kind, limit=20
+            )
+            distractors = _select_fill_blank_distractors(p, pool)
         out.append(ProblemWithDistractors(problem=p, distractors=distractors))
     return out
 
@@ -186,6 +213,28 @@ async def _reload_session_problems(
 # ---------------------------------------------------------------------------
 # 공개 API
 # ---------------------------------------------------------------------------
+
+
+async def discard_today_session(db: AsyncSession, *, user_id: UUID) -> bool:
+    """배치시험 완료 시 배치 전 생성된 오늘 세션과 미학습 ReviewRecord 정리.
+
+    state="NEW", last_reviewed_at IS NULL, reps=0 인 레코드만 삭제해 실제 풀이분을 보존한다.
+    세션이 없으면 False 반환.
+    """
+    today = datetime.now(UTC).date()
+    session = await study_session_repo.delete_today(db, user_id=user_id, today_date=today)
+    if session is None:
+        return False
+
+    # 세션의 planned_problem_ids → content_item_id 추출 → 미학습 ReviewRecord 정리
+    planned_ids = [UUID(pid) for pid in session.planned_problem_ids]
+    if planned_ids:
+        problems = await content_repo.get_problems_by_ids(db, planned_ids)
+        citem_ids = list({p.content_item_id for p in problems})
+        await review_repo.delete_new_records_for_items(
+            db, user_id=user_id, content_item_ids=citem_ids
+        )
+    return True
 
 
 async def build_today_session(

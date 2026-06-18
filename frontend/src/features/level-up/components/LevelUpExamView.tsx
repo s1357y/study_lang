@@ -118,7 +118,7 @@ export function LevelUpExamView({
         <div className="mb-2 h-1.5 w-full overflow-hidden rounded-full bg-neutral-100">
           <div
             className="h-full rounded-full bg-neutral-900 transition-all"
-            style={{ width: `${(currentIndex / data.total) * 100}%` }}
+            style={{ width: `${((currentIndex + 1) / data.total) * 100}%` }}
           />
         </div>
         {submitMutation.isPending ? (

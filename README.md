@@ -203,6 +203,7 @@ npm run dev
 | 8 | 다중 문제 유형 (MCQ_GRAMMAR·MCQ_CONTEXT·MCQ_SYNONYM) + 문법 콘텐츠 생성 + N2~N5 어휘/문법 시드 |
 | 9 | 학습 세션 연장 + LLM 폴백 + 배치고사 유형 혼합 (5문제×4레벨) + 레벨업 시험 (JLPT 형식, 20문제) |
 | 10 | MCQ_MEANING 오답 다양화 — distractor 풀 6~9개 확장 + 세션마다 `random.sample(3)` + `--upgrade` 기존 레코드 재보강 |
+| 11 | FILL_BLANK → MCQ 전환 (배치·레벨업·학습 세션 전체) + 전체 흐름 버그 수정 (SRS 상태 매핑 오류 감지, StudyError 전파, 캐시 무효화 완성, progress bar off-by-one, ProblemType 타입 동기화) |
 
 ---
 

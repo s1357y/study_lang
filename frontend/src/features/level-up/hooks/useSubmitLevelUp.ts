@@ -9,8 +9,11 @@ export function useSubmitLevelUp() {
   return useMutation({
     mutationFn: submitLevelUp,
     onSuccess: () => {
-      // 자격 캐시 무효화 — 합격 후 배너 즉시 숨김
+      // 레벨 변경 후 관련 캐시 전체 무효화 — eligibility·학습 세션·통계·모티베이션 stale 방지
       queryClient.invalidateQueries({ queryKey: ["level-up", "eligibility"] });
+      queryClient.invalidateQueries({ queryKey: ["study", "session", "today"] });
+      queryClient.invalidateQueries({ queryKey: ["study", "stats"] });
+      queryClient.invalidateQueries({ queryKey: ["motivation"] });
     },
   });
 }

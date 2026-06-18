@@ -48,7 +48,10 @@ async def get_or_create_today_session(
     user: User = Depends(current_user),
     db: AsyncSession = Depends(get_db),
 ) -> StudySessionOut:
-    session, problems = await study_service.build_today_session(db, user)
+    try:
+        session, problems = await study_service.build_today_session(db, user)
+    except StudyError as exc:
+        raise _study_error_to_http(exc) from exc
 
     problems_out = [
         ProblemOut(

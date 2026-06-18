@@ -21,8 +21,11 @@ from uuid import UUID
 from fsrs import Card, Rating, Scheduler, State
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.logging import get_logger
 from app.models.review_record import ReviewRecord
 from app.repositories import attempt_repo, review_repo
+
+logger = get_logger(__name__)
 
 # DB 상태 문자열 ↔ py-fsrs State enum 변환 테이블
 # "NEW" 는 py-fsrs 에 없는 내부 상태 — fresh Card() 로 처리
@@ -92,7 +95,11 @@ async def schedule_next(
     # 결과를 ReviewRecord 에 반영
     record.stability = updated_card.stability
     record.difficulty = updated_card.difficulty
-    record.state = _FSRS_TO_STATE.get(updated_card.state, "LEARNING")
+    try:
+        record.state = _FSRS_TO_STATE[updated_card.state]
+    except KeyError:
+        logger.error("Unknown FSRS card state: %s — py-fsrs 버전 확인 필요", updated_card.state)
+        raise
     record.last_reviewed_at = updated_card.last_review
 
     # reps/lapses 는 Card 에 없으므로 수동 추적

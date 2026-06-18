@@ -49,7 +49,7 @@ BEGINNER (N5) → ELEMENTARY (N4) → INTERMEDIATE (N3) → ADVANCED (N2)
 
 1. **콘텐츠 풀 분리**: vocabulary / grammar 두 종류. `ContentItem.kind` 로 구분.
 2. **문제 선저장 유형**: MCQ_GRAMMAR·MCQ_CONTEXT·MCQ_SYNONYM은 생성 시 `Problem.distractors` JSONB에 선저장. 세션 빌드 시 풀 조회 불필요.
-3. **동적 유형**: MCQ_MEANING·MCQ_READING은 같은 레벨·kind 풀에서 동적 추출.
+3. **동적 유형**: MCQ_MEANING·MCQ_READING·FILL_BLANK는 같은 레벨·kind 풀에서 동적 추출. FILL_BLANK는 `payload["word"]` 기준으로 오답 선택지 구성 — DB의 `distractors` 컬럼은 비어 있어도 무방.
 4. **ReviewRecord 선생성**: 세션 빌드 시 신규 ContentItem마다 `get_or_create()` 호출 → `get_new_content_items()`가 이 아이템을 다시 반환하지 않음.
 5. **completed_problem_ids ARRAY**: list 재할당으로 dirty flag 트리거 (SQLAlchemy mutable 한계).
 

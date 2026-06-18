@@ -235,8 +235,8 @@ export type StudyStats = {
 export type ProblemOut = {
   problem_id: string;
   content_item_id: string;
-  // 백엔드 ProblemType 소문자 값과 동일하게 유지
-  problem_type: "mcq_meaning" | "mcq_reading" | "fill_blank" | "short_answer" | "translation" | "listening";
+  // 백엔드 ProblemType 소문자 값과 동일하게 유지 (study/types.ts Zod 스키마와 동기화)
+  problem_type: "mcq_meaning" | "mcq_reading" | "fill_blank" | "translation" | "listening" | "mcq_grammar" | "mcq_context" | "mcq_synonym";
   prompt: string;
   answer: string;
   distractors: string[];
