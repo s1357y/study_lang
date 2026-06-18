@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import random
 from datetime import datetime
 from typing import Any
 from uuid import UUID
@@ -74,6 +75,7 @@ async def get_pool(
     *,
     language: str = "ja",
     level: str,
+    kind: str = "vocabulary",
     filter_tags: list[str] | None = None,
     exclude_ids: list[UUID] | None = None,
     limit: int = 10,
@@ -81,7 +83,9 @@ async def get_pool(
     # 조건에 맞는 콘텐츠 풀 조회 — created_at 오름차순 (먼저 생성된 것 우선)
     stmt = (
         select(ContentItem)
-        .where(ContentItem.language == language, ContentItem.level == level)
+        .where(
+            ContentItem.language == language, ContentItem.level == level, ContentItem.kind == kind
+        )
         .order_by(ContentItem.created_at.asc())
         .limit(limit)
     )
@@ -103,11 +107,13 @@ async def get_seeds(
     *,
     language: str = "ja",
     level: str,
+    kind: str = "vocabulary",
 ) -> list[ContentItem]:
     # source="seed" 인 기존 seed 항목 조회 — 중복 삽입 방지용
     stmt = select(ContentItem).where(
         ContentItem.language == language,
         ContentItem.level == level,
+        ContentItem.kind == kind,
         ContentItem.source == "seed",
     )
     result = await db.execute(stmt)
@@ -142,11 +148,34 @@ async def get_problem_by_id(db: AsyncSession, problem_id: UUID) -> Problem | Non
     return await db.get(Problem, problem_id)
 
 
+async def get_random_problem_per_item(
+    db: AsyncSession,
+    content_item_ids: list[UUID],
+) -> dict[UUID, Problem]:
+    """ContentItem당 가용 Problem 중 랜덤 1개 선택 — 세션마다 문제 유형 다양성 확보."""
+    if not content_item_ids:
+        return {}
+    stmt = select(Problem).where(Problem.content_item_id.in_(content_item_ids))
+    result = await db.execute(stmt)
+    all_problems = result.scalars().all()
+
+    # content_item_id별로 그룹핑
+    groups: dict[UUID, list[Problem]] = {}
+    for p in all_problems:
+        groups.setdefault(p.content_item_id, []).append(p)
+
+    # 각 그룹에서 랜덤 1개 선택
+    return {cid: random.choice(problems) for cid, problems in groups.items()}
+
+
 async def get_representative_problems(
     db: AsyncSession,
     content_item_ids: list[UUID],
 ) -> dict[UUID, Problem]:
-    """ContentItem 당 MCQ_MEANING 우선 대표 Problem 하나를 반환."""
+    """ContentItem 당 MCQ_MEANING 우선 대표 Problem 하나를 반환.
+
+    하위 호환 별칭 — 신규 코드는 get_random_problem_per_item() 사용 권장.
+    """
     if not content_item_ids:
         return {}
     stmt = select(Problem).where(Problem.content_item_id.in_(content_item_ids))
@@ -193,15 +222,17 @@ async def get_problems_for_placement(
     language: str = "ja",
     level: str,
     problem_type: ProblemType = ProblemType.MCQ_MEANING,
+    kind: str = "vocabulary",
     limit: int = 3,
 ) -> list[Problem]:
-    # Problem JOIN ContentItem 으로 레벨 필터 + random 샘플링
+    # Problem JOIN ContentItem 으로 레벨·kind 필터 + random 샘플링
     stmt = (
         select(Problem)
         .join(ContentItem, Problem.content_item_id == ContentItem.id)
         .where(
             ContentItem.language == language,
             ContentItem.level == level,
+            ContentItem.kind == kind,
             Problem.type == problem_type,
         )
         .order_by(func.random())
@@ -216,12 +247,17 @@ async def get_items_by_level_excluding(
     *,
     level: str,
     exclude_id: UUID,
+    kind: str = "vocabulary",
     limit: int = 20,
 ) -> list[ContentItem]:
-    # MCQ 오답 선택지 후보 — 같은 레벨에서 해당 아이템만 제외
+    # MCQ 오답 선택지 후보 — 같은 레벨·kind 에서 해당 아이템만 제외
     stmt = (
         select(ContentItem)
-        .where(ContentItem.level == level, ContentItem.id != exclude_id)
+        .where(
+            ContentItem.level == level,
+            ContentItem.kind == kind,
+            ContentItem.id != exclude_id,
+        )
         .limit(limit)
     )
     result = await db.execute(stmt)

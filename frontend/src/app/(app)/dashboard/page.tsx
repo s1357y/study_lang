@@ -4,9 +4,17 @@
 
 import Link from "next/link";
 
+import { useLevelUpEligibility } from "@/features/level-up/hooks/useLevelUpEligibility";
 import { MotivationPanel } from "@/features/motivation/components/MotivationPanel";
 import { useStudyStats } from "@/features/study/hooks/useStudyStats";
 import { useAuth } from "@/lib/auth/AuthProvider";
+
+const LEVEL_LABEL: Record<string, string> = {
+  BEGINNER: "N5",
+  ELEMENTARY: "N4",
+  INTERMEDIATE: "N3",
+  ADVANCED: "N2",
+};
 
 function StatBadge({ label, value }: { label: string; value: number }) {
   return (
@@ -20,6 +28,7 @@ function StatBadge({ label, value }: { label: string; value: number }) {
 export default function DashboardPage() {
   const { data: stats, isLoading, error } = useStudyStats();
   const { state } = useAuth();
+  const { data: eligibility } = useLevelUpEligibility();
 
   const user = state.status === "authenticated" ? state.user : null;
   const hasItems =
@@ -32,6 +41,22 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-bold">대시보드</h1>
+
+      {/* 레벨업 시험 배너 — 응시 자격 있을 때 표시 */}
+      {eligibility?.eligible && eligibility.next_level && (
+        <section className="rounded-2xl border border-green-100 bg-green-50 p-5">
+          <h2 className="text-sm font-semibold text-green-800">레벨업 도전 준비 완료!</h2>
+          <p className="mt-1 text-xs text-green-600">
+            {LEVEL_LABEL[eligibility.next_level] ?? eligibility.next_level} 레벨 시험에 응시할 수 있습니다.
+          </p>
+          <Link
+            href="/level-up"
+            className="mt-3 inline-block rounded-xl bg-green-700 px-4 py-2 text-xs font-semibold text-white hover:bg-green-800"
+          >
+            레벨업 시험 보기 →
+          </Link>
+        </section>
+      )}
 
       {/* 배치 시험 CTA — placement_done=false 인 경우만 표시 */}
       {user && !user.placement_done && (

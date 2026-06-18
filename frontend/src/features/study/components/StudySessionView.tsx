@@ -7,15 +7,39 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { useStudySession } from "../hooks/useStudySession";
+import { useExtendSession } from "../hooks/useExtendSession";
 import { useSubmitAttempt } from "../hooks/useSubmitAttempt";
 import type { StudySession } from "../types";
 import { StudyCard } from "./StudyCard";
 
-function CompletionScreen({ total }: { total: number }) {
+function CompletionScreen({
+  total,
+  onExtend,
+  isExtending,
+  extendFailed,
+}: {
+  total: number;
+  onExtend: () => void;
+  isExtending: boolean;
+  extendFailed: boolean;
+}) {
   return (
     <div className="flex flex-col items-center gap-4 py-16 text-center">
       <p className="text-4xl font-bold text-neutral-900">완료!</p>
       <p className="text-neutral-600">오늘 {total}문제를 모두 풀었습니다.</p>
+      {extendFailed ? (
+        <p className="mt-2 text-sm text-neutral-500">
+          지금은 추가 콘텐츠를 준비 중입니다.
+        </p>
+      ) : (
+        <button
+          onClick={onExtend}
+          disabled={isExtending}
+          className="mt-2 rounded-xl bg-neutral-100 px-6 py-3 text-sm font-semibold text-neutral-900 hover:bg-neutral-200 disabled:opacity-40"
+        >
+          {isExtending ? "불러오는 중…" : "더 공부하기"}
+        </button>
+      )}
       <Link
         href="/dashboard"
         className="mt-4 rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white hover:bg-neutral-700"
@@ -47,11 +71,20 @@ function SessionInner({ session }: { session: StudySession }) {
   // completed_count 에서 시작 — 이미 완료한 문제는 스킵
   const [currentIndex, setCurrentIndex] = useState(session.completed_count);
   const submitAttemptMutation = useSubmitAttempt();
+  const extendMutation = useExtendSession();
 
   const total = session.problems.length;
 
   if (total === 0) return <EmptySessionScreen />;
-  if (currentIndex >= total) return <CompletionScreen total={total} />;
+  if (currentIndex >= total)
+    return (
+      <CompletionScreen
+        total={total}
+        onExtend={() => extendMutation.mutate()}
+        isExtending={extendMutation.isPending}
+        extendFailed={extendMutation.isError}
+      />
+    );
 
   const currentProblem = session.problems[currentIndex];
 

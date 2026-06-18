@@ -9,7 +9,8 @@
       "meaning_ko": "개",
       "example_ja": "犬が好きです。",
       "example_ko": "개를 좋아합니다.",
-      "tags": ["noun", "animal", "N5"]
+      "tags": ["noun", "animal", "N5"],
+      "confusable_meanings": ["고양이", "토끼", "소"]
     },
     {
       "word": "猫",
@@ -17,7 +18,8 @@
       "meaning_ko": "고양이",
       "example_ja": "猫はかわいいです。",
       "example_ko": "고양이는 귀엽습니다.",
-      "tags": ["noun", "animal", "N5"]
+      "tags": ["noun", "animal", "N5"],
+      "confusable_meanings": ["강아지", "새", "다람쥐"]
     },
     {
       "word": "子ども",
@@ -25,7 +27,8 @@
       "meaning_ko": "어린이, 아이",
       "example_ja": "子どもが公園で遊びます。",
       "example_ko": "아이가 공원에서 놉니다.",
-      "tags": ["noun", "people", "N5"]
+      "tags": ["noun", "people", "N5"],
+      "confusable_meanings": ["청소년", "유아", "어른"]
     },
     {
       "word": "男",
@@ -33,7 +36,8 @@
       "meaning_ko": "남자",
       "example_ja": "あの男は先生です。",
       "example_ko": "저 남자는 선생님입니다.",
-      "tags": ["noun", "people", "N5"]
+      "tags": ["noun", "people", "N5"],
+      "confusable_meanings": ["소년", "신사", "아저씨"]
     },
     {
       "word": "女",
@@ -41,7 +45,8 @@
       "meaning_ko": "여자",
       "example_ja": "女の人が来ました。",
       "example_ko": "여자가 왔습니다.",
-      "tags": ["noun", "people", "N5"]
+      "tags": ["noun", "people", "N5"],
+      "confusable_meanings": ["소녀", "아주머니", "아가씨"]
     },
     {
       "word": "兄",
@@ -49,7 +54,8 @@
       "meaning_ko": "형, 오빠",
       "example_ja": "兄は会社員です。",
       "example_ko": "형은 회사원입니다.",
-      "tags": ["noun", "people", "family", "N5"]
+      "tags": ["noun", "people", "family", "N5"],
+      "confusable_meanings": ["남동생", "아버지", "아들"]
     },
     {
       "word": "姉",
@@ -57,7 +63,8 @@
       "meaning_ko": "언니, 누나",
       "example_ja": "姉は料理が上手です。",
       "example_ko": "언니는 요리를 잘합니다.",
-      "tags": ["noun", "people", "family", "N5"]
+      "tags": ["noun", "people", "family", "N5"],
+      "confusable_meanings": ["여동생", "어머니", "딸"]
     },
     {
       "word": "弟",
@@ -65,7 +72,8 @@
       "meaning_ko": "남동생",
       "example_ja": "弟は中学生です。",
       "example_ko": "남동생은 중학생입니다.",
-      "tags": ["noun", "people", "family", "N5"]
+      "tags": ["noun", "people", "family", "N5"],
+      "confusable_meanings": ["형", "사촌", "조카"]
     },
     {
       "word": "妹",
@@ -73,7 +81,8 @@
       "meaning_ko": "여동생",
       "example_ja": "妹はかわいいです。",
       "example_ko": "여동생은 귀엽습니다.",
-      "tags": ["noun", "people", "family", "N5"]
+      "tags": ["noun", "people", "family", "N5"],
+      "confusable_meanings": ["언니", "조카딸", "사촌"]
     },
     {
       "word": "家族",
@@ -81,7 +90,8 @@
       "meaning_ko": "가족",
       "example_ja": "家族と旅行します。",
       "example_ko": "가족과 여행합니다.",
-      "tags": ["noun", "people", "family", "N5"]
+      "tags": ["noun", "people", "family", "N5"],
+      "confusable_meanings": ["친척", "부모", "형제"]
     },
     {
       "word": "駅",
@@ -89,7 +99,8 @@
       "meaning_ko": "역",
       "example_ja": "駅まで歩きます。",
       "example_ko": "역까지 걷습니다.",
-      "tags": ["noun", "place", "N5"]
+      "tags": ["noun", "place", "N5"],
+      "confusable_meanings": ["버스 정류장", "공항", "항구"]
     },
     {
       "word": "病院",
@@ -97,7 +108,8 @@
       "meaning_ko": "병원",
       "example_ja": "病院に行きます。",
       "example_ko": "병원에 갑니다.",
-      "tags": ["noun", "place", "N5"]
+      "tags": ["noun", "place", "N5"],
+      "confusable_meanings": ["약국", "보건소", "의원"]
     },
     {
       "word": "会社",
@@ -105,7 +117,8 @@
       "meaning_ko": "회사",
       "example_ja": "会社は九時に始まります。",
       "example_ko": "회사는 9시에 시작합니다.",
-      "tags": ["noun", "place", "work", "N5"]
+      "tags": ["noun", "place", "work", "N5"],
+      "confusable_meanings": ["사무실", "공장", "사업체"]
     },
     {
       "word": "図書館",
@@ -113,7 +126,8 @@
       "meaning_ko": "도서관",
       "example_ja": "図書館で本を読みます。",
       "example_ko": "도서관에서 책을 읽습니다.",
-      "tags": ["noun", "place", "N5"]
+      "tags": ["noun", "place", "N5"],
+      "confusable_meanings": ["서점", "자료실", "열람실"]
     },
     {
       "word": "公園",
@@ -121,7 +135,8 @@
       "meaning_ko": "공원",
       "example_ja": "公園で散歩します。",
       "example_ko": "공원에서 산책합니다.",
-      "tags": ["noun", "place", "N5"]
+      "tags": ["noun", "place", "N5"],
+      "confusable_meanings": ["정원", "광장", "놀이터"]
     },
     {
       "word": "銀行",
@@ -129,7 +144,8 @@
       "meaning_ko": "은행",
       "example_ja": "銀行でお金をおろします。",
       "example_ko": "은행에서 돈을 찾습니다.",
-      "tags": ["noun", "place", "N5"]
+      "tags": ["noun", "place", "N5"],
+      "confusable_meanings": ["우체국", "금고", "증권사"]
     },
     {
       "word": "郵便局",
@@ -137,7 +153,8 @@
       "meaning_ko": "우체국",
       "example_ja": "郵便局で手紙を出します。",
       "example_ko": "우체국에서 편지를 부칩니다.",
-      "tags": ["noun", "place", "N5"]
+      "tags": ["noun", "place", "N5"],
+      "confusable_meanings": ["은행", "편의점", "세무서"]
     },
     {
       "word": "車",
@@ -145,7 +162,8 @@
       "meaning_ko": "자동차, 차",
       "example_ja": "車で会社に行きます。",
       "example_ko": "차로 회사에 갑니다.",
-      "tags": ["noun", "object", "transport", "N5"]
+      "tags": ["noun", "object", "transport", "N5"],
+      "confusable_meanings": ["버스", "트럭", "오토바이"]
     },
     {
       "word": "自転車",
@@ -153,7 +171,8 @@
       "meaning_ko": "자전거",
       "example_ja": "自転車で学校に行きます。",
       "example_ko": "자전거로 학교에 갑니다.",
-      "tags": ["noun", "object", "transport", "N5"]
+      "tags": ["noun", "object", "transport", "N5"],
+      "confusable_meanings": ["오토바이", "킥보드", "스쿠터"]
     },
     {
       "word": "電話",
@@ -161,7 +180,8 @@
       "meaning_ko": "전화",
       "example_ja": "電話をかけます。",
       "example_ko": "전화를 겁니다.",
-      "tags": ["noun", "object", "N5"]
+      "tags": ["noun", "object", "N5"],
+      "confusable_meanings": ["문자", "이메일", "팩스"]
     },
     {
       "word": "新聞",
@@ -169,7 +189,8 @@
       "meaning_ko": "신문",
       "example_ja": "毎朝新聞を読みます。",
       "example_ko": "매일 아침 신문을 읽습니다.",
-      "tags": ["noun", "object", "daily-life", "N5"]
+      "tags": ["noun", "object", "daily-life", "N5"],
+      "confusable_meanings": ["잡지", "주간지", "소책자"]
     },
     {
       "word": "お金",
@@ -177,7 +198,8 @@
       "meaning_ko": "돈",
       "example_ja": "お金がありません。",
       "example_ko": "돈이 없습니다.",
-      "tags": ["noun", "object", "N5"]
+      "tags": ["noun", "object", "N5"],
+      "confusable_meanings": ["지폐", "재산", "예금"]
     },
     {
       "word": "手紙",
@@ -185,7 +207,8 @@
       "meaning_ko": "편지",
       "example_ja": "手紙を書きます。",
       "example_ko": "편지를 씁니다.",
-      "tags": ["noun", "object", "N5"]
+      "tags": ["noun", "object", "N5"],
+      "confusable_meanings": ["엽서", "소포", "메모"]
     },
     {
       "word": "荷物",
@@ -193,7 +216,8 @@
       "meaning_ko": "짐, 짐꾸러미",
       "example_ja": "荷物が重いです。",
       "example_ko": "짐이 무겁습니다.",
-      "tags": ["noun", "object", "N5"]
+      "tags": ["noun", "object", "N5"],
+      "confusable_meanings": ["상자", "가방", "보따리"]
     },
     {
       "word": "部屋",
@@ -201,7 +225,8 @@
       "meaning_ko": "방",
       "example_ja": "部屋を掃除します。",
       "example_ko": "방을 청소합니다.",
-      "tags": ["noun", "object", "daily-life", "N5"]
+      "tags": ["noun", "object", "daily-life", "N5"],
+      "confusable_meanings": ["거실", "침실", "사무실"]
     },
     {
       "word": "朝",
@@ -209,7 +234,8 @@
       "meaning_ko": "아침",
       "example_ja": "朝ごはんを食べます。",
       "example_ko": "아침밥을 먹습니다.",
-      "tags": ["noun", "time", "N5"]
+      "tags": ["noun", "time", "N5"],
+      "confusable_meanings": ["새벽", "오전", "낮"]
     },
     {
       "word": "夜",
@@ -217,7 +243,8 @@
       "meaning_ko": "밤",
       "example_ja": "夜は静かです。",
       "example_ko": "밤은 조용합니다.",
-      "tags": ["noun", "time", "N5"]
+      "tags": ["noun", "time", "N5"],
+      "confusable_meanings": ["저녁", "새벽", "심야"]
     },
     {
       "word": "来週",
@@ -225,7 +252,8 @@
       "meaning_ko": "다음 주",
       "example_ja": "来週また会いましょう。",
       "example_ko": "다음 주에 또 만납시다.",
-      "tags": ["noun", "time", "N5"]
+      "tags": ["noun", "time", "N5"],
+      "confusable_meanings": ["이번 주", "다음 달", "내일"]
     },
     {
       "word": "去年",
@@ -233,7 +261,8 @@
       "meaning_ko": "작년",
       "example_ja": "去年日本に行きました。",
       "example_ko": "작년에 일본에 갔습니다.",
-      "tags": ["noun", "time", "N5"]
+      "tags": ["noun", "time", "N5"],
+      "confusable_meanings": ["올해", "재작년", "내년"]
     },
     {
       "word": "毎日",
@@ -241,7 +270,8 @@
       "meaning_ko": "매일",
       "example_ja": "毎日運動します。",
       "example_ko": "매일 운동합니다.",
-      "tags": ["noun", "time", "N5"]
+      "tags": ["noun", "time", "N5"],
+      "confusable_meanings": ["매주", "매달", "하루 종일"]
     },
     {
       "word": "起きる",
@@ -249,7 +279,8 @@
       "meaning_ko": "일어나다",
       "example_ja": "毎朝七時に起きます。",
       "example_ko": "매일 아침 7시에 일어납니다.",
-      "tags": ["verb", "ichidan", "daily-life", "N5"]
+      "tags": ["verb", "ichidan", "daily-life", "N5"],
+      "confusable_meanings": ["눕다", "앉다", "서다"]
     },
     {
       "word": "寝る",
@@ -257,7 +288,8 @@
       "meaning_ko": "자다",
       "example_ja": "十時に寝ます。",
       "example_ko": "10시에 잡니다.",
-      "tags": ["verb", "ichidan", "daily-life", "N5"]
+      "tags": ["verb", "ichidan", "daily-life", "N5"],
+      "confusable_meanings": ["쉬다", "눕다", "졸다"]
     },
     {
       "word": "見る",
@@ -265,7 +297,8 @@
       "meaning_ko": "보다",
       "example_ja": "テレビを見ます。",
       "example_ko": "텔레비전을 봅니다.",
-      "tags": ["verb", "ichidan", "N5"]
+      "tags": ["verb", "ichidan", "N5"],
+      "confusable_meanings": ["살피다", "관찰하다", "바라보다"]
     },
     {
       "word": "着る",
@@ -273,7 +306,8 @@
       "meaning_ko": "입다",
       "example_ja": "コートを着ます。",
       "example_ko": "코트를 입습니다.",
-      "tags": ["verb", "ichidan", "clothes", "N5"]
+      "tags": ["verb", "ichidan", "clothes", "N5"],
+      "confusable_meanings": ["신다", "걸치다", "쓰다"]
     },
     {
       "word": "借りる",
@@ -281,7 +315,8 @@
       "meaning_ko": "빌리다",
       "example_ja": "本を借りました。",
       "example_ko": "책을 빌렸습니다.",
-      "tags": ["verb", "ichidan", "N5"]
+      "tags": ["verb", "ichidan", "N5"],
+      "confusable_meanings": ["빌려주다", "훔치다", "사다"]
     },
     {
       "word": "教える",
@@ -289,7 +324,8 @@
       "meaning_ko": "가르치다",
       "example_ja": "英語を教えます。",
       "example_ko": "영어를 가르칩니다.",
-      "tags": ["verb", "ichidan", "work", "N5"]
+      "tags": ["verb", "ichidan", "work", "N5"],
+      "confusable_meanings": ["배우다", "설명하다", "안내하다"]
     },
     {
       "word": "降りる",
@@ -297,7 +333,8 @@
       "meaning_ko": "내리다",
       "example_ja": "駅で電車を降ります。",
       "example_ko": "역에서 전차를 내립니다.",
-      "tags": ["verb", "ichidan", "transport", "N5"]
+      "tags": ["verb", "ichidan", "transport", "N5"],
+      "confusable_meanings": ["타다", "올라가다", "내려가다"]
     },
     {
       "word": "読む",
@@ -305,7 +342,8 @@
       "meaning_ko": "읽다",
       "example_ja": "本を読みます。",
       "example_ko": "책을 읽습니다.",
-      "tags": ["verb", "godan", "N5"]
+      "tags": ["verb", "godan", "N5"],
+      "confusable_meanings": ["쓰다", "외우다", "훑어보다"]
     },
     {
       "word": "書く",
@@ -313,7 +351,8 @@
       "meaning_ko": "쓰다",
       "example_ja": "手紙を書きます。",
       "example_ko": "편지를 씁니다.",
-      "tags": ["verb", "godan", "N5"]
+      "tags": ["verb", "godan", "N5"],
+      "confusable_meanings": ["그리다", "새기다", "인쇄하다"]
     },
     {
       "word": "話す",
@@ -321,7 +360,8 @@
       "meaning_ko": "말하다, 이야기하다",
       "example_ja": "日本語で話します。",
       "example_ko": "일본어로 말합니다.",
-      "tags": ["verb", "godan", "N5"]
+      "tags": ["verb", "godan", "N5"],
+      "confusable_meanings": ["속삭이다", "소리치다", "중얼거리다"]
     },
     {
       "word": "聞く",
@@ -329,7 +369,8 @@
       "meaning_ko": "듣다, 묻다",
       "example_ja": "音楽を聞きます。",
       "example_ko": "음악을 듣습니다.",
-      "tags": ["verb", "godan", "N5"]
+      "tags": ["verb", "godan", "N5"],
+      "confusable_meanings": ["말하다", "대답하다", "이해하다"]
     },
     {
       "word": "歩く",
@@ -337,7 +378,8 @@
       "meaning_ko": "걷다",
       "example_ja": "公園を歩きます。",
       "example_ko": "공원을 걷습니다.",
-      "tags": ["verb", "godan", "N5"]
+      "tags": ["verb", "godan", "N5"],
+      "confusable_meanings": ["뛰다", "달리다", "비틀거리다"]
     },
     {
       "word": "泳ぐ",
@@ -345,7 +387,8 @@
       "meaning_ko": "수영하다",
       "example_ja": "海で泳ぎます。",
       "example_ko": "바다에서 수영합니다.",
-      "tags": ["verb", "godan", "sport", "N5"]
+      "tags": ["verb", "godan", "sport", "N5"],
+      "confusable_meanings": ["잠수하다", "물에 뜨다", "낚시하다"]
     },
     {
       "word": "飲む",
@@ -353,7 +396,8 @@
       "meaning_ko": "마시다",
       "example_ja": "コーヒーを飲みます。",
       "example_ko": "커피를 마십니다.",
-      "tags": ["verb", "godan", "daily-life", "N5"]
+      "tags": ["verb", "godan", "daily-life", "N5"],
+      "confusable_meanings": ["먹다", "삼키다", "씹다"]
     },
     {
       "word": "小さい",
@@ -361,7 +405,8 @@
       "meaning_ko": "작다",
       "example_ja": "小さい犬がいます。",
       "example_ko": "작은 개가 있습니다.",
-      "tags": ["adjective", "i-adj", "N5"]
+      "tags": ["adjective", "i-adj", "N5"],
+      "confusable_meanings": ["가늘다", "짧다", "낮다"]
     },
     {
       "word": "高い",
@@ -369,7 +414,8 @@
       "meaning_ko": "높다, 비싸다",
       "example_ja": "この山は高いです。",
       "example_ko": "이 산은 높습니다.",
-      "tags": ["adjective", "i-adj", "N5"]
+      "tags": ["adjective", "i-adj", "N5"],
+      "confusable_meanings": ["크다", "넓다", "무겁다"]
     },
     {
       "word": "安い",
@@ -377,7 +423,8 @@
       "meaning_ko": "싸다, 저렴하다",
       "example_ja": "このお店は安いです。",
       "example_ko": "이 가게는 쌉니다.",
-      "tags": ["adjective", "i-adj", "N5"]
+      "tags": ["adjective", "i-adj", "N5"],
+      "confusable_meanings": ["낮다", "가볍다", "적다"]
     },
     {
       "word": "新しい",
@@ -385,7 +432,8 @@
       "meaning_ko": "새롭다",
       "example_ja": "新しいかばんを買いました。",
       "example_ko": "새 가방을 샀습니다.",
-      "tags": ["adjective", "i-adj", "N5"]
+      "tags": ["adjective", "i-adj", "N5"],
+      "confusable_meanings": ["깨끗하다", "현대적이다", "신선하다"]
     },
     {
       "word": "古い",
@@ -393,7 +441,8 @@
       "meaning_ko": "낡다, 오래되다",
       "example_ja": "古い本があります。",
       "example_ko": "낡은 책이 있습니다.",
-      "tags": ["adjective", "i-adj", "N5"]
+      "tags": ["adjective", "i-adj", "N5"],
+      "confusable_meanings": ["더럽다", "헤지다", "퇴색하다"]
     },
     {
       "word": "便利",
@@ -401,7 +450,8 @@
       "meaning_ko": "편리하다",
       "example_ja": "このアプリは便利です。",
       "example_ko": "이 앱은 편리합니다.",
-      "tags": ["adjective", "na-adj", "N5"]
+      "tags": ["adjective", "na-adj", "N5"],
+      "confusable_meanings": ["효율적이다", "실용적이다", "쉽다"]
     },
     {
       "word": "大切",
@@ -409,7 +459,8 @@
       "meaning_ko": "소중하다, 중요하다",
       "example_ja": "健康は大切です。",
       "example_ko": "건강은 소중합니다.",
-      "tags": ["adjective", "na-adj", "N5"]
+      "tags": ["adjective", "na-adj", "N5"],
+      "confusable_meanings": ["귀하다", "필수적이다", "가치있다"]
     },
     {
       "word": "丁寧",
@@ -417,7 +468,8 @@
       "meaning_ko": "정중하다, 공손하다",
       "example_ja": "丁寧に話してください。",
       "example_ko": "정중하게 말해주세요.",
-      "tags": ["adjective", "na-adj", "N5"]
+      "tags": ["adjective", "na-adj", "N5"],
+      "confusable_meanings": ["친절하다", "겸손하다", "예의바르다"]
     }
   ]
 }

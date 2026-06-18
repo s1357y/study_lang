@@ -1,0 +1,32 @@
+다음 조건에 맞는 일본어 문법 표현을 {{ count }}개 생성해주세요.
+
+조건:
+- 레벨: {{ level }} (ELEMENTARY=JLPT N4, INTERMEDIATE=JLPT N3)
+{% if tags -%}
+- 집중 영역: {{ tags | join(", ") }}
+{% endif -%}
+{% if existing_patterns -%}
+- 이미 존재하는 문법 포인트 (반드시 제외): {{ existing_patterns | join(", ") }}
+{% endif -%}
+- JLPT 文法1 (文の文法) 유형에 직접 대응하는 문법 표현
+- wrong_patterns 에는 오답 선택지로 쓸 혼동하기 쉬운 표현을 정확히 3개 포함
+- wrong_patterns 의 각 항목은 「〜」 접두어 없이 실제 형태만 입력 (예: "のに", "から")
+- example_ja 는 한 문장이고, 그 안에 grammar_point (「〜」 제외한 실제 형태)가 반드시 포함되어야 함
+
+아래 JSON 형식으로만 응답하세요. 코드블록, 설명, 마크다운 없이 JSON만 출력하세요:
+
+{
+  "items": [
+    {
+      "grammar_point": "〜ので",
+      "pattern_ja": "普通形+ので / ナ形+なので",
+      "meaning_ko": "〜이기 때문에",
+      "usage_ko": "원인·이유를 객관적으로 나타낸다. から보다 정중한 뉘앙스.",
+      "example_ja": "雨が降るので、傘を持ってきました。",
+      "example_ko": "비가 오기 때문에 우산을 가져왔습니다.",
+      "similar_patterns": ["〜から", "〜ために"],
+      "wrong_patterns": ["のに", "ために", "から"],
+      "tags": ["grammar", "conjunction", "reason", "N4"]
+    }
+  ]
+}

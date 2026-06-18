@@ -57,11 +57,18 @@ class StudyStatsOut(BaseModel):
 
 class ContentItemPayload(BaseModel):
     # extra="allow" 로 미래 필드 추가에도 유연하게 대응
+    # vocabulary 필드
     word: str | None = None
     reading: str | None = None
     meaning_ko: str | None = None
     example_ja: str | None = None
     example_ko: str | None = None
+    # grammar 필드
+    grammar_point: str | None = None
+    pattern_ja: str | None = None
+    usage_ko: str | None = None
+    similar_patterns: list[str] | None = None
+    wrong_patterns: list[str] | None = None
 
     model_config = {"extra": "allow"}
 

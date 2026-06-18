@@ -15,7 +15,7 @@ import {
 } from "@/lib/auth/tokenStore";
 
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8001";
 
 // ============================================================================
 // 타입
@@ -291,6 +291,13 @@ export async function submitAttempt(
   });
 }
 
+// POST — 오늘 세션에 추가 문제 10개 붙이기 (풀 소진 시 LLM 생성 폴백)
+export async function extendTodaySession(): Promise<StudySession> {
+  return request<StudySession>("/api/v1/study/sessions/today/extend", {
+    method: "POST",
+  });
+}
+
 // ============================================================================
 // 동기부여 도메인 타입
 // ============================================================================
@@ -314,13 +321,81 @@ export async function fetchMotivation(): Promise<MotivationState> {
 }
 
 // ============================================================================
+// 레벨업 시험 도메인 타입
+// ============================================================================
+
+export type LevelUpEligibility = {
+  eligible: boolean;
+  studied_count: number;
+  required_count: number;
+  cooldown_until: string | null;
+  next_level: string | null;
+};
+
+export type LevelUpProblem = {
+  problem_id: string;
+  content_item_id: string;
+  problem_type: string;
+  prompt: string;
+  answer: string;
+  distractors: string[];
+  tags: string[];
+};
+
+export type LevelUpProblemsResponse = {
+  problems: LevelUpProblem[];
+  total: number;
+  level_up_token: string;
+  from_level: string;
+  to_level: string;
+};
+
+export type LevelUpResult = {
+  passed: boolean;
+  score: number;
+  correct: number;
+  total: number;
+  from_level: string;
+  to_level: string;
+  message: string;
+};
+
+// ============================================================================
+// 레벨업 시험 도메인 함수
+// ============================================================================
+
+export async function fetchLevelUpEligibility(): Promise<LevelUpEligibility> {
+  return request<LevelUpEligibility>("/api/v1/level-up/eligibility");
+}
+
+export async function fetchLevelUpProblems(): Promise<LevelUpProblemsResponse> {
+  return request<LevelUpProblemsResponse>("/api/v1/level-up/problems");
+}
+
+export async function submitLevelUp(body: {
+  level_up_token: string;
+  answers: Record<string, boolean>;
+}): Promise<LevelUpResult> {
+  return request<LevelUpResult>("/api/v1/level-up/submit", {
+    method: "POST",
+    body,
+  });
+}
+
+// ============================================================================
 // 배치 시험 도메인 타입
 // ============================================================================
 
 export type PlacementProblem = {
   problem_id: string;
   content_item_id: string;
-  problem_type: string;
+  problem_type:
+    | "mcq_meaning"
+    | "mcq_reading"
+    | "fill_blank"
+    | "mcq_grammar"
+    | "mcq_context"
+    | "mcq_synonym";
   prompt: string;
   answer: string;
   distractors: string[];

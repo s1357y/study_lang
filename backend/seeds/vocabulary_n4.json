@@ -9,7 +9,8 @@
       "meaning_ko": "여행",
       "example_ja": "来月、旅行に行きます。",
       "example_ko": "다음 달에 여행을 갑니다.",
-      "tags": ["noun", "activity", "N4"]
+      "tags": ["noun", "activity", "N4"],
+      "confusable_meanings": ["관광", "출장", "견학"]
     },
     {
       "word": "練習",
@@ -17,7 +18,8 @@
       "meaning_ko": "연습",
       "example_ja": "毎日ピアノを練習しています。",
       "example_ko": "매일 피아노를 연습하고 있습니다.",
-      "tags": ["noun", "activity", "N4"]
+      "tags": ["noun", "activity", "N4"],
+      "confusable_meanings": ["훈련", "준비", "반복"]
     },
     {
       "word": "運動",
@@ -25,7 +27,8 @@
       "meaning_ko": "운동",
       "example_ja": "健康のために運動が大切です。",
       "example_ko": "건강을 위해 운동이 중요합니다.",
-      "tags": ["noun", "health", "N4"]
+      "tags": ["noun", "health", "N4"],
+      "confusable_meanings": ["체조", "스포츠", "훈련"]
     },
     {
       "word": "音楽",
@@ -33,7 +36,8 @@
       "meaning_ko": "음악",
       "example_ja": "音楽を聴きながら勉強します。",
       "example_ko": "음악을 들으면서 공부합니다.",
-      "tags": ["noun", "culture", "N4"]
+      "tags": ["noun", "culture", "N4"],
+      "confusable_meanings": ["노래", "소리", "리듬"]
     },
     {
       "word": "文化",
@@ -41,7 +45,8 @@
       "meaning_ko": "문화",
       "example_ja": "日本の文化に興味があります。",
       "example_ko": "일본 문화에 관심이 있습니다.",
-      "tags": ["noun", "society", "N4"]
+      "tags": ["noun", "society", "N4"],
+      "confusable_meanings": ["전통", "풍습", "예술"]
     },
     {
       "word": "予定",
@@ -49,7 +54,8 @@
       "meaning_ko": "예정, 계획",
       "example_ja": "週末の予定はありますか。",
       "example_ko": "주말 예정이 있습니까?",
-      "tags": ["noun", "schedule", "N4"]
+      "tags": ["noun", "schedule", "N4"],
+      "confusable_meanings": ["일정", "약속", "스케줄"]
     },
     {
       "word": "経験",
@@ -57,7 +63,8 @@
       "meaning_ko": "경험",
       "example_ja": "海外での経験が役に立ちました。",
       "example_ko": "해외에서의 경험이 도움이 되었습니다.",
-      "tags": ["noun", "general", "N4"]
+      "tags": ["noun", "general", "N4"],
+      "confusable_meanings": ["기억", "능력", "지식"]
     },
     {
       "word": "結婚",
@@ -65,7 +72,8 @@
       "meaning_ko": "결혼",
       "example_ja": "来年、結婚する予定です。",
       "example_ko": "내년에 결혼할 예정입니다.",
-      "tags": ["noun", "life", "N4"]
+      "tags": ["noun", "life", "N4"],
+      "confusable_meanings": ["약혼", "이혼", "연애"]
     },
     {
       "word": "留学",
@@ -73,7 +81,8 @@
       "meaning_ko": "유학",
       "example_ja": "大学を卒業してから留学したいです。",
       "example_ko": "대학을 졸업하고 나서 유학하고 싶습니다.",
-      "tags": ["noun", "education", "N4"]
+      "tags": ["noun", "education", "N4"],
+      "confusable_meanings": ["해외 연수", "이민", "여행"]
     },
     {
       "word": "準備",
@@ -81,7 +90,8 @@
       "meaning_ko": "준비",
       "example_ja": "試験の準備を始めました。",
       "example_ko": "시험 준비를 시작했습니다.",
-      "tags": ["noun", "activity", "N4"]
+      "tags": ["noun", "activity", "N4"],
+      "confusable_meanings": ["계획", "확인", "정리"]
     }
   ]
 }

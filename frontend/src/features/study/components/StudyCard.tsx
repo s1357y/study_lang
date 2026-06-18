@@ -14,7 +14,19 @@ const PROMPT_LABEL: Record<string, string> = {
   short_answer: "답을 입력하세요",
   translation: "번역하세요",
   listening: "들은 내용을 입력하세요",
+  mcq_grammar: "빈칸에 들어갈 문법 표현을 고르세요",
+  mcq_context: "밑줄 친 단어의 의미를 고르세요",
+  mcq_synonym: "같은 의미의 표현을 고르세요",
 };
+
+// MCQ 방식으로 렌더링할 문제 유형 집합
+const MCQ_TYPES = new Set([
+  "mcq_meaning",
+  "mcq_reading",
+  "mcq_grammar",
+  "mcq_context",
+  "mcq_synonym",
+]);
 
 type Props = {
   problem: ProblemOut;
@@ -31,11 +43,29 @@ function shuffleChoices(answer: string, distractors: string[]): string[] {
   return arr;
 }
 
+function renderPrompt(text: string): React.ReactNode {
+  // ___ 구간을 시각적으로 강조 (MCQ_GRAMMAR, MCQ_CONTEXT 빈칸 표시)
+  if (!text.includes("___")) return <>{text}</>;
+  const parts = text.split("___");
+  return (
+    <>
+      {parts.map((part, i, arr) => (
+        <span key={i}>
+          {part}
+          {i < arr.length - 1 && (
+            <span className="mx-0.5 inline-block border-b-2 border-neutral-900 px-1 font-bold">
+              {"　　　"}
+            </span>
+          )}
+        </span>
+      ))}
+    </>
+  );
+}
+
 export function StudyCard({ problem, onNext }: Props) {
   const startTimeRef = useRef(Date.now());
-  const isMcq =
-    problem.problem_type === "mcq_meaning" ||
-    problem.problem_type === "mcq_reading";
+  const isMcq = MCQ_TYPES.has(problem.problem_type);
 
   // problem_id 가 바뀔 때(= key 교체) 자동 재마운트되므로 셔플은 최초 1회만
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -65,7 +95,9 @@ export function StudyCard({ problem, onNext }: Props) {
         <p className="text-sm text-neutral-500">
           {PROMPT_LABEL[problem.problem_type] ?? "문제"}
         </p>
-        <p className="mt-2 text-xl font-bold">{problem.prompt}</p>
+        <p className="mt-2 whitespace-pre-line text-xl font-bold">
+          {renderPrompt(problem.prompt)}
+        </p>
 
         <div
           className={`mt-4 rounded-xl p-4 ${isCorrect ? "bg-green-50" : "bg-red-50"}`}
@@ -97,7 +129,9 @@ export function StudyCard({ problem, onNext }: Props) {
       <p className="text-sm text-neutral-500">
         {PROMPT_LABEL[problem.problem_type] ?? "문제"}
       </p>
-      <p className="mt-2 text-xl font-bold">{problem.prompt}</p>
+      <p className="mt-2 whitespace-pre-line text-xl font-bold">
+        {renderPrompt(problem.prompt)}
+      </p>
 
       {isMcq ? (
         <ul className="mt-4 flex flex-col gap-2">

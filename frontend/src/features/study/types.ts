@@ -12,7 +12,17 @@ export const ProblemOutSchema = z.object({
   problem_id: z.string().uuid(),
   content_item_id: z.string().uuid(),
   // 백엔드 ProblemType 열거값(소문자)과 동일하게 유지
-  problem_type: z.enum(["mcq_meaning", "mcq_reading", "fill_blank", "short_answer", "translation", "listening"]),
+  problem_type: z.enum([
+    "mcq_meaning",
+    "mcq_reading",
+    "fill_blank",
+    "short_answer",
+    "translation",
+    "listening",
+    "mcq_grammar",
+    "mcq_context",
+    "mcq_synonym",
+  ]),
   prompt: z.string(),
   answer: z.string(),
   distractors: z.array(z.string()),
@@ -53,11 +63,18 @@ export const ReviewItemSchema = z.object({
   answer: z.string(),
   tags: z.array(z.string()),
   payload: z.object({
+    // vocabulary 필드
     word: z.string().optional(),
     reading: z.string().optional(),
     meaning_ko: z.string().optional(),
     example_ja: z.string().optional(),
     example_ko: z.string().optional(),
+    // grammar 필드
+    grammar_point: z.string().optional(),
+    pattern_ja: z.string().optional(),
+    usage_ko: z.string().optional(),
+    similar_patterns: z.array(z.string()).optional(),
+    wrong_patterns: z.array(z.string()).optional(),
   }),
   my_correct: z.boolean().nullable(),
   my_rating: z.string().nullable(),

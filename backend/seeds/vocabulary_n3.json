@@ -9,7 +9,8 @@
       "meaning_ko": "환경",
       "example_ja": "環境問題は世界中で深刻です。",
       "example_ko": "환경 문제는 전 세계적으로 심각합니다.",
-      "tags": ["noun", "society", "N3"]
+      "tags": ["noun", "society", "N3"],
+      "confusable_meanings": ["자연", "생태계", "대기"]
     },
     {
       "word": "経済",
@@ -17,7 +18,8 @@
       "meaning_ko": "경제",
       "example_ja": "最近、経済の状況が変わってきた。",
       "example_ko": "최근 경제 상황이 변해왔다.",
-      "tags": ["noun", "society", "N3"]
+      "tags": ["noun", "society", "N3"],
+      "confusable_meanings": ["금융", "산업", "무역"]
     },
     {
       "word": "技術",
@@ -25,7 +27,8 @@
       "meaning_ko": "기술",
       "example_ja": "最新の技術が私たちの生活を変えている。",
       "example_ko": "최신 기술이 우리의 생활을 바꾸고 있다.",
-      "tags": ["noun", "technology", "N3"]
+      "tags": ["noun", "technology", "N3"],
+      "confusable_meanings": ["방법", "능력", "도구"]
     },
     {
       "word": "研究",
@@ -33,7 +36,8 @@
       "meaning_ko": "연구",
       "example_ja": "大学院でAIの研究をしています。",
       "example_ko": "대학원에서 AI 연구를 하고 있습니다.",
-      "tags": ["noun", "education", "N3"]
+      "tags": ["noun", "education", "N3"],
+      "confusable_meanings": ["조사", "분석", "검토"]
     },
     {
       "word": "影響",
@@ -41,7 +45,8 @@
       "meaning_ko": "영향",
       "example_ja": "気候変動は農業に大きな影響を与えている。",
       "example_ko": "기후 변화는 농업에 큰 영향을 주고 있다.",
-      "tags": ["noun", "general", "N3"]
+      "tags": ["noun", "general", "N3"],
+      "confusable_meanings": ["효과", "결과", "반응"]
     },
     {
       "word": "判断",
@@ -49,7 +54,8 @@
       "meaning_ko": "판단",
       "example_ja": "状況を見て自分で判断してください。",
       "example_ko": "상황을 보고 스스로 판단해 주세요.",
-      "tags": ["noun", "general", "N3"]
+      "tags": ["noun", "general", "N3"],
+      "confusable_meanings": ["결정", "평가", "선택"]
     },
     {
       "word": "状況",
@@ -57,7 +63,8 @@
       "meaning_ko": "상황",
       "example_ja": "現在の状況を説明してください。",
       "example_ko": "현재 상황을 설명해 주세요.",
-      "tags": ["noun", "general", "N3"]
+      "tags": ["noun", "general", "N3"],
+      "confusable_meanings": ["환경", "조건", "형편"]
     },
     {
       "word": "解決",
@@ -65,7 +72,8 @@
       "meaning_ko": "해결",
       "example_ja": "この問題の解決策を考えています。",
       "example_ko": "이 문제의 해결책을 생각하고 있습니다.",
-      "tags": ["noun", "general", "N3"]
+      "tags": ["noun", "general", "N3"],
+      "confusable_meanings": ["처리", "극복", "수습"]
     },
     {
       "word": "目的",
@@ -73,7 +81,8 @@
       "meaning_ko": "목적",
       "example_ja": "この旅行の目的は何ですか。",
       "example_ko": "이 여행의 목적은 무엇입니까?",
-      "tags": ["noun", "general", "N3"]
+      "tags": ["noun", "general", "N3"],
+      "confusable_meanings": ["목표", "이유", "동기"]
     },
     {
       "word": "可能性",
@@ -81,7 +90,8 @@
       "meaning_ko": "가능성",
       "example_ja": "成功する可能性はまだあります。",
       "example_ko": "성공할 가능성은 아직 있습니다.",
-      "tags": ["noun", "general", "N3"]
+      "tags": ["noun", "general", "N3"],
+      "confusable_meanings": ["기회", "확률", "전망"]
     }
   ]
 }

@@ -38,6 +38,8 @@ def _study_error_to_http(exc: StudyError) -> HTTPException:
         return HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc))
     if exc.code == "invalid_date":
         return HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    if exc.code == "no_more_content":
+        return HTTPException(status.HTTP_409_CONFLICT, detail=str(exc))
     return HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 
@@ -47,6 +49,39 @@ async def get_or_create_today_session(
     db: AsyncSession = Depends(get_db),
 ) -> StudySessionOut:
     session, problems = await study_service.build_today_session(db, user)
+
+    problems_out = [
+        ProblemOut(
+            problem_id=pw.problem.id,
+            content_item_id=pw.problem.content_item_id,
+            problem_type=pw.problem.type.value,
+            prompt=pw.problem.prompt,
+            answer=pw.problem.answer,
+            distractors=pw.distractors,
+            tags=pw.problem.tags,
+        )
+        for pw in problems
+    ]
+    return StudySessionOut(
+        id=session.id,
+        date=session.date,
+        problems=problems_out,
+        completed_count=len(session.completed_problem_ids),
+        total_count=len(session.planned_problem_ids),
+        started_at=session.started_at,
+    )
+
+
+@router.post("/sessions/today/extend", response_model=StudySessionOut)
+async def extend_today_session(
+    user: User = Depends(current_user),
+    db: AsyncSession = Depends(get_db),
+) -> StudySessionOut:
+    """오늘 세션에 추가 문제 10개를 붙인다. 풀 소진 시 LLM 생성 폴백."""
+    try:
+        session, problems = await study_service.extend_today_session(db, user)
+    except StudyError as exc:
+        raise _study_error_to_http(exc) from exc
 
     problems_out = [
         ProblemOut(

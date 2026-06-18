@@ -8,8 +8,8 @@
 
 from __future__ import annotations
 
-from enum import Enum
-from typing import Any
+from enum import StrEnum
+from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid4
 
 from sqlalchemy import ForeignKey, String, Text, TypeDecorator
@@ -19,22 +19,31 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
 
+if TYPE_CHECKING:
+    from app.models.content_item import ContentItem
 
-class ProblemType(str, Enum):
+
+class ProblemType(StrEnum):
     """출제 가능한 문제 유형.
 
     TRANSLATION 의 방향(ko_to_jp / jp_to_ko)은 Problem.meta["direction"] 로 저장.
     LISTENING 은 Phase 5+ 에서 TTS 인프라 준비 후 활성화.
+    신규 MCQ 유형(MCQ_GRAMMAR·MCQ_CONTEXT·MCQ_SYNONYM)은 distractors 가 생성 시 선저장됨.
     """
-    MCQ_MEANING = "mcq_meaning"   # 일본어 단어 → 한국어 의미 고르기
-    MCQ_READING = "mcq_reading"   # 漢字 → 히라가나 읽기 고르기
-    FILL_BLANK  = "fill_blank"    # 예문 빈칸에 단어 채우기
-    TRANSLATION = "translation"   # 한국어 ↔ 일본어 번역 (방향: meta.direction)
-    LISTENING   = "listening"     # 오디오 듣고 의미/읽기 고르기
+
+    MCQ_MEANING = "mcq_meaning"  # 일본어 단어 → 한국어 의미 고르기
+    MCQ_READING = "mcq_reading"  # 漢字 → 히라가나 읽기 고르기
+    FILL_BLANK = "fill_blank"  # 예문 빈칸에 단어 채우기
+    TRANSLATION = "translation"  # 한국어 ↔ 일본어 번역 (방향: meta.direction)
+    LISTENING = "listening"  # 오디오 듣고 의미/읽기 고르기
+    MCQ_GRAMMAR = "mcq_grammar"  # 문장 빈칸에 맞는 문법 표현 선택 (JLPT 文法1)
+    MCQ_CONTEXT = "mcq_context"  # 문맥에서 밑줄 단어의 의미 선택 (JLPT 文脈規定)
+    MCQ_SYNONYM = "mcq_synonym"  # 유의어·바꿔쓰기 선택 (JLPT 言い換え類義)
 
 
 class ProblemTypeDecorator(TypeDecorator):
     """DB String(20) ↔ ProblemType enum 자동 변환."""
+
     impl = String(20)
     cache_ok = True
 

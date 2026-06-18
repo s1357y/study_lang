@@ -39,8 +39,10 @@ logger = get_logger(__name__)
 
 _LEVELS = ["BEGINNER", "ELEMENTARY", "INTERMEDIATE", "ADVANCED"]
 _PASS_THRESHOLD = 2 / 3
-_PROBLEMS_PER_LEVEL = 3
+_PROBLEMS_PER_LEVEL = 5  # 총 20문제 (레벨 4개 × 5문제)
 _TOKEN_TTL_SEC = 1800  # 30분
+# grammar 시드가 존재하는 레벨 — BEGINNER·ADVANCED는 MCQ_MEANING으로 대체
+_GRAMMAR_LEVELS = frozenset({"ELEMENTARY", "INTERMEDIATE"})
 
 
 class PlacementError(Exception):
@@ -122,61 +124,166 @@ def compute_level(
 # ---------------------------------------------------------------------------
 
 
+async def _build_placement_distractors(
+    db: AsyncSession,
+    problem: Problem,
+    level: str,
+) -> list[str]:
+    """배치 시험 문제의 오답 선택지 구성.
+
+    선저장 유형(MCQ_GRAMMAR·MCQ_CONTEXT·MCQ_SYNONYM)은 JSONB에서 직접 읽고,
+    동적 유형(MCQ_MEANING·MCQ_READING)은 같은 레벨 풀에서 추출한다.
+    """
+    pre_stored = {ProblemType.MCQ_GRAMMAR, ProblemType.MCQ_CONTEXT, ProblemType.MCQ_SYNONYM}
+    if problem.type in pre_stored:
+        return (problem.distractors or {}).get("options", [])
+
+    # MCQ_MEANING 선저장 distractors 우선 — pool 쿼리 불필요
+    if problem.type == ProblemType.MCQ_MEANING and problem.distractors:
+        return (problem.distractors or {}).get("options", [])
+
+    if problem.type not in (ProblemType.MCQ_MEANING, ProblemType.MCQ_READING):
+        return []
+
+    pool = await content_repo.get_items_by_level_excluding(
+        db, level=level, exclude_id=problem.content_item_id, kind="vocabulary", limit=20
+    )
+    field_key = "meaning_ko" if problem.type == ProblemType.MCQ_MEANING else "reading"
+    seen: set[str] = {problem.answer}
+    distractors: list[str] = []
+    for ci in pool:
+        val = ci.payload.get(field_key, "")
+        if val and val not in seen:
+            seen.add(val)
+            distractors.append(val)
+        if len(distractors) >= 3:
+            break
+    return distractors
+
+
 async def get_placement_problems(
     db: AsyncSession,
     *,
     user: User,
     language: str = "ja",
 ) -> PlacementProblemsOut:
-    """레벨별 3문제 샘플링 후 셔플하여 placement_token 과 함께 반환."""
+    """레벨별 5문제(혼합 유형) 샘플링 후 셔플하여 placement_token 과 함께 반환.
+
+    구성 (레벨당 5문제, 총 20문제):
+    - MCQ_MEANING × 2  (vocabulary)
+    - MCQ_READING × 1  (vocabulary, 한자 단어 우선)
+    - MCQ_GRAMMAR × 1  (grammar, ELEMENTARY·INTERMEDIATE만; 없으면 MCQ_MEANING 1개 보충)
+    - MCQ_CONTEXT × 1  (vocabulary; 없으면 MCQ_SYNONYM, 없으면 MCQ_MEANING 1개 보충)
+    """
     placement_problems: list[_PlacementProblem] = []
     sampled_levels: set[str] = set()
 
     for level in _LEVELS:
-        problems = await content_repo.get_problems_for_placement(
+        level_problems: list[Problem] = []
+
+        # 1) MCQ_MEANING × 2
+        meaning_probs = await content_repo.get_problems_for_placement(
             db,
             language=language,
             level=level,
             problem_type=ProblemType.MCQ_MEANING,
-            limit=_PROBLEMS_PER_LEVEL,
+            kind="vocabulary",
+            limit=2,
         )
-        if not problems:
-            logger.info("배치 시험: %s 레벨 콘텐츠 없음 — 건너뜀", level)
-            continue
+        level_problems.extend(meaning_probs)
 
-        # MCQ_MEANING 부족 시 타 유형으로 보충
-        if len(problems) < _PROBLEMS_PER_LEVEL:
-            extra = await content_repo.get_problems_for_placement(
+        # 2) MCQ_READING × 1
+        reading_probs = await content_repo.get_problems_for_placement(
+            db,
+            language=language,
+            level=level,
+            problem_type=ProblemType.MCQ_READING,
+            kind="vocabulary",
+            limit=1,
+        )
+        level_problems.extend(reading_probs)
+
+        # 3) MCQ_GRAMMAR × 1 (grammar 시드 있는 레벨만; 없으면 MCQ_MEANING 보충)
+        if level in _GRAMMAR_LEVELS:
+            grammar_probs = await content_repo.get_problems_for_placement(
                 db,
                 language=language,
                 level=level,
-                problem_type=ProblemType.FILL_BLANK,
-                limit=_PROBLEMS_PER_LEVEL - len(problems),
+                problem_type=ProblemType.MCQ_GRAMMAR,
+                kind="grammar",
+                limit=1,
             )
-            problems = problems + extra
+            if grammar_probs:
+                level_problems.extend(grammar_probs)
+            else:
+                fill = await content_repo.get_problems_for_placement(
+                    db,
+                    language=language,
+                    level=level,
+                    problem_type=ProblemType.MCQ_MEANING,
+                    kind="vocabulary",
+                    limit=1,
+                )
+                level_problems.extend(fill)
+        else:
+            # BEGINNER·ADVANCED: grammar 없으므로 MCQ_MEANING 1개 보충
+            fill = await content_repo.get_problems_for_placement(
+                db,
+                language=language,
+                level=level,
+                problem_type=ProblemType.MCQ_MEANING,
+                kind="vocabulary",
+                limit=1,
+            )
+            level_problems.extend(fill)
 
-        # ContentItem 일괄 조회 (오답 선택지 구성용)
-        citem_ids = [p.content_item_id for p in problems]
-        citem_map = await content_repo.get_items_by_ids(db, citem_ids)
+        # 4) MCQ_CONTEXT × 1 (없으면 MCQ_SYNONYM, 없으면 MCQ_MEANING 보충)
+        ctx_probs = await content_repo.get_problems_for_placement(
+            db,
+            language=language,
+            level=level,
+            problem_type=ProblemType.MCQ_CONTEXT,
+            kind="vocabulary",
+            limit=1,
+        )
+        if ctx_probs:
+            level_problems.extend(ctx_probs)
+        else:
+            syn_probs = await content_repo.get_problems_for_placement(
+                db,
+                language=language,
+                level=level,
+                problem_type=ProblemType.MCQ_SYNONYM,
+                kind="vocabulary",
+                limit=1,
+            )
+            if syn_probs:
+                level_problems.extend(syn_probs)
+            else:
+                fill = await content_repo.get_problems_for_placement(
+                    db,
+                    language=language,
+                    level=level,
+                    problem_type=ProblemType.MCQ_MEANING,
+                    kind="vocabulary",
+                    limit=1,
+                )
+                level_problems.extend(fill)
 
-        for p in problems:
-            distractors: list[str] = []
-            if p.type in (ProblemType.MCQ_MEANING, ProblemType.MCQ_READING):
-                item = citem_map.get(p.content_item_id)
-                if item:
-                    # 같은 레벨의 다른 아이템에서 오답 선택지 3개 추출
-                    pool = await content_repo.get_items_by_level_excluding(
-                        db, level=item.level, exclude_id=item.id, limit=20
-                    )
-                    field_key = "meaning_ko" if p.type == ProblemType.MCQ_MEANING else "reading"
-                    seen = {p.answer}
-                    for ci in pool:
-                        val = ci.payload.get(field_key, "")
-                        if val and val not in seen:
-                            seen.add(val)
-                            distractors.append(val)
-                        if len(distractors) >= 3:
-                            break
+        if not level_problems:
+            logger.info("배치 시험: %s 레벨 콘텐츠 없음 — 건너뜀", level)
+            continue
+
+        # 중복 제거 (id 기준)
+        seen_ids: set[UUID] = set()
+        unique_problems: list[Problem] = []
+        for p in level_problems:
+            if p.id not in seen_ids:
+                seen_ids.add(p.id)
+                unique_problems.append(p)
+
+        for p in unique_problems:
+            distractors = await _build_placement_distractors(db, p, level)
             placement_problems.append(
                 _PlacementProblem(problem=p, level=level, distractors=distractors)
             )

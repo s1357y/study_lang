@@ -36,6 +36,8 @@ function CorrectBadge({ correct }: { correct: boolean | null }) {
 
 export function ReviewFlashCard({ item }: Props) {
   const [flipped, setFlipped] = useState(false);
+  const { payload } = item;
+  const isGrammar = Boolean(payload.grammar_point);
 
   return (
     <button
@@ -49,7 +51,7 @@ export function ReviewFlashCard({ item }: Props) {
             <span className="text-xs text-neutral-400">탭하여 답 확인</span>
             <CorrectBadge correct={item.my_correct} />
           </div>
-          <p className="text-xl font-bold">{item.prompt}</p>
+          <p className="whitespace-pre-line text-xl font-bold">{item.prompt}</p>
           {item.tags.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {item.tags.map((tag) => (
@@ -71,19 +73,48 @@ export function ReviewFlashCard({ item }: Props) {
             <CorrectBadge correct={item.my_correct} />
           </div>
           <p className="text-xl font-bold text-neutral-900">{item.answer}</p>
-          {item.payload.reading && item.payload.reading !== item.answer && (
-            <p className="text-sm text-neutral-500">읽기: {item.payload.reading}</p>
-          )}
-          {item.payload.meaning_ko && (
-            <p className="text-sm text-neutral-700">{item.payload.meaning_ko}</p>
-          )}
-          {item.payload.example_ja && (
-            <div className="rounded-xl bg-neutral-50 p-3 text-sm">
-              <p className="text-neutral-700">{item.payload.example_ja}</p>
-              {item.payload.example_ko && (
-                <p className="mt-1 text-neutral-400">{item.payload.example_ko}</p>
+
+          {isGrammar ? (
+            // grammar 콘텐츠 — 문법 포인트·패턴·사용법 표시
+            <div className="flex flex-col gap-2">
+              <div className="rounded-xl bg-neutral-50 p-3 text-sm">
+                <p className="font-medium text-neutral-900">
+                  {payload.pattern_ja ?? payload.grammar_point}
+                </p>
+                {payload.meaning_ko && (
+                  <p className="mt-0.5 text-neutral-600">{payload.meaning_ko}</p>
+                )}
+              </div>
+              {payload.usage_ko && (
+                <p className="text-xs text-neutral-500">{payload.usage_ko}</p>
+              )}
+              {payload.example_ja && (
+                <div className="rounded-xl bg-neutral-50 p-3 text-sm">
+                  <p className="text-neutral-700">{payload.example_ja}</p>
+                  {payload.example_ko && (
+                    <p className="mt-1 text-neutral-400">{payload.example_ko}</p>
+                  )}
+                </div>
               )}
             </div>
+          ) : (
+            // vocabulary 콘텐츠 — 기존 표시 구조 유지
+            <>
+              {payload.reading && payload.reading !== item.answer && (
+                <p className="text-sm text-neutral-500">읽기: {payload.reading}</p>
+              )}
+              {payload.meaning_ko && (
+                <p className="text-sm text-neutral-700">{payload.meaning_ko}</p>
+              )}
+              {payload.example_ja && (
+                <div className="rounded-xl bg-neutral-50 p-3 text-sm">
+                  <p className="text-neutral-700">{payload.example_ja}</p>
+                  {payload.example_ko && (
+                    <p className="mt-1 text-neutral-400">{payload.example_ko}</p>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

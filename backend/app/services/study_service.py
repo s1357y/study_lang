@@ -55,12 +55,35 @@ class ProblemWithDistractors:
 # ---------------------------------------------------------------------------
 
 
+# 생성 시점에 distractors가 선저장된 문제 유형 — 세션 빌드 시 풀 선택 불필요
+_PRE_STORED_TYPES = frozenset(
+    {
+        ProblemType.MCQ_GRAMMAR,
+        ProblemType.MCQ_CONTEXT,
+        ProblemType.MCQ_SYNONYM,
+    }
+)
+
+
 def _select_distractors(
     problem: Problem,
     item: ContentItem,
     pool: list[ContentItem],
 ) -> list[str]:
-    """MCQ 유형 오답 선택지 3개를 pool 에서 추출."""
+    """MCQ 유형 오답 선택지 3개를 반환.
+
+    선저장 유형(MCQ_GRAMMAR·MCQ_CONTEXT·MCQ_SYNONYM)은 problem.distractors 에서 직접 읽고,
+    동적 선택 유형(MCQ_MEANING·MCQ_READING)은 pool 에서 추출한다.
+    MCQ_MEANING 이 선저장 distractors 를 가지면 pool 없이 바로 반환한다.
+    """
+    # MCQ_MEANING 선저장 distractors 우선 — confusable_meanings 가 있는 신규 콘텐츠
+    if problem.type == ProblemType.MCQ_MEANING and problem.distractors:
+        return (problem.distractors or {}).get("options", [])
+
+    # 선저장 유형 — distractors JSONB에서 읽기
+    if problem.type in _PRE_STORED_TYPES:
+        return (problem.distractors or {}).get("options", [])
+
     if problem.type not in (ProblemType.MCQ_MEANING, ProblemType.MCQ_READING):
         return []
 
@@ -84,7 +107,8 @@ async def _build_problems_with_distractors(
     content_item_ids: list[UUID],
 ) -> tuple[list[ProblemWithDistractors], list[str]]:
     """content_item_ids 로 ProblemWithDistractors 목록과 planned_problem_ids 반환."""
-    problem_map = await content_repo.get_representative_problems(db, content_item_ids)
+    # 랜덤 선택 — 세션마다 다양한 문제 유형 노출
+    problem_map = await content_repo.get_random_problem_per_item(db, content_item_ids)
     citem_map = await content_repo.get_items_by_ids(db, content_item_ids)
 
     result: list[ProblemWithDistractors] = []
@@ -100,11 +124,18 @@ async def _build_problems_with_distractors(
             continue
 
         distractors: list[str] = []
-        if problem.type in (ProblemType.MCQ_MEANING, ProblemType.MCQ_READING):
-            pool = await content_repo.get_items_by_level_excluding(
-                db, level=item.level, exclude_id=item.id, limit=20
-            )
-            distractors = _select_distractors(problem, item, pool)
+        if problem.type in _PRE_STORED_TYPES:
+            # 선저장 유형은 pool 조회 없이 distractors에서 직접 추출
+            distractors = _select_distractors(problem, item, [])
+        elif problem.type in (ProblemType.MCQ_MEANING, ProblemType.MCQ_READING):
+            # MCQ_MEANING에 선저장 distractors가 있으면 pool 쿼리 자체를 건너뜀
+            if problem.type == ProblemType.MCQ_MEANING and problem.distractors:
+                distractors = _select_distractors(problem, item, [])
+            else:
+                pool = await content_repo.get_items_by_level_excluding(
+                    db, level=item.level, exclude_id=item.id, kind=item.kind, limit=20
+                )
+                distractors = _select_distractors(problem, item, pool)
 
         result.append(ProblemWithDistractors(problem=problem, distractors=distractors))
         planned_ids.append(str(problem.id))
@@ -134,11 +165,18 @@ async def _reload_session_problems(
         if item is None:
             continue
         distractors: list[str] = []
-        if p.type in (ProblemType.MCQ_MEANING, ProblemType.MCQ_READING):
-            pool = await content_repo.get_items_by_level_excluding(
-                db, level=item.level, exclude_id=item.id, limit=20
-            )
-            distractors = _select_distractors(p, item, pool)
+        if p.type in _PRE_STORED_TYPES:
+            # 선저장 유형 — JSONB에서 직접 추출 (pool 조회 불필요)
+            distractors = _select_distractors(p, item, [])
+        elif p.type in (ProblemType.MCQ_MEANING, ProblemType.MCQ_READING):
+            # MCQ_MEANING에 선저장 distractors가 있으면 pool 쿼리 자체를 건너뜀
+            if p.type == ProblemType.MCQ_MEANING and p.distractors:
+                distractors = _select_distractors(p, item, [])
+            else:
+                pool = await content_repo.get_items_by_level_excluding(
+                    db, level=item.level, exclude_id=item.id, kind=item.kind, limit=20
+                )
+                distractors = _select_distractors(p, item, pool)
         out.append(ProblemWithDistractors(problem=p, distractors=distractors))
     return out
 
@@ -235,6 +273,47 @@ async def record_attempt(
 
     await db.commit()
     return log, record
+
+
+async def extend_today_session(
+    db: AsyncSession,
+    user: User,
+    *,
+    extra: int = 10,
+) -> tuple[StudySession, list[ProblemWithDistractors]]:
+    """오늘 세션에 추가 문제를 붙인다. 풀 소진 시 LLM으로 신규 어휘 생성 후 재시도."""
+    from app.services import generation_service  # 순환 임포트 방지
+
+    today = datetime.now(UTC).date()
+    session = await study_session_repo.get_today(db, user_id=user.id, today_date=today)
+    if session is None:
+        raise StudyError("오늘 세션이 없습니다.", code="session_not_found")
+
+    new_items = await review_repo.get_new_content_items(
+        db, user_id=user.id, level=user.level, limit=extra
+    )
+    if not new_items:
+        # 콘텐츠 풀 소진 → LLM으로 신규 어휘 생성 후 재사용
+        logger.info("콘텐츠 풀 소진 — LLM 생성 시작: level=%s", user.level)
+        new_items = await generation_service.generate_vocabulary(
+            db, level=user.level, tags=[], count=extra
+        )
+    if not new_items:
+        raise StudyError("추가 학습 콘텐츠를 생성하지 못했습니다.", code="no_more_content")
+
+    for ci in new_items:
+        await review_repo.get_or_create(db, user_id=user.id, content_item_id=ci.id)
+
+    new_cids = [ci.id for ci in new_items]
+    new_problems, new_planned_ids = await _build_problems_with_distractors(db, new_cids)
+
+    # ARRAY 더티 플래그 트리거 — list 재할당 필요
+    existing_planned = session.planned_problem_ids
+    session.planned_problem_ids = existing_planned + new_planned_ids
+
+    existing_problems = await _reload_session_problems(db, existing_planned)
+    await db.commit()
+    return session, existing_problems + new_problems
 
 
 async def get_stats(

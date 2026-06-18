@@ -18,6 +18,8 @@
 - **API 경로**: 외부 노출은 모두 `/api/v1/...` 아래.
 - **환경변수**: 루트 `.env.example` 에 등록한 다음 사용. 시크릿 노출 금지.
 
+- **study-flow.md 갱신** — `study_service.py` · `srs_service.py` · `study_session_repo.py` · `level_up_service.py` · `useSubmitAttempt.ts` · `useStudySession.ts` 수정 시 [`docs/architecture/study-flow.md`](./docs/architecture/study-flow.md) 도 동기화.
+
 ## 도메인 개요
 
 | 영역 | 위치 | 책임 |
