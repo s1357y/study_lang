@@ -139,9 +139,9 @@ export function PlacementView() {
           결과에 따라 맞춤 레벨이 자동으로 배정됩니다.
         </p>
         <ul className="mt-4 space-y-2 text-sm text-neutral-500">
-          <li>• 최대 12문제 (레벨별 3문제)</li>
-          <li>• 객관식 위주, 평균 3~5분 소요</li>
-          <li>• 언제든지 다시 볼 수 있습니다</li>
+          <li>• 최대 20문제 (레벨별 최대 5문제)</li>
+          <li>• 객관식 혼합, 평균 5~10분 소요</li>
+          <li>• 완료 후 레벨업 시험으로 레벨을 높일 수 있습니다</li>
         </ul>
 
         {error && (
