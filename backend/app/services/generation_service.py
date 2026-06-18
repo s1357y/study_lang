@@ -107,7 +107,7 @@ async def generate_vocabulary(
 
         # MCQ_MEANING: 단어 보고 한국어 의미 고르기
         # 정답과 동일한 항목을 방어 필터로 제거 (LLM이 정답을 오답 칸에 넣는 케이스 방지)
-        safe_cm = [m for m in vocab.confusable_meanings if m != vocab.meaning_ko][:3]
+        safe_cm = [m for m in vocab.confusable_meanings if m != vocab.meaning_ko][:9]
         await content_repo.create_problem(
             db,
             content_item_id=item.id,

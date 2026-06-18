@@ -134,7 +134,7 @@ async def seed_vocabulary(db, *, level: str, dry_run: bool) -> None:
 
         # MCQ_MEANING — 항상 생성 (confusable_meanings 있으면 선저장, 없으면 None)
         # 정답과 동일한 항목은 방어 필터로 제거
-        cm = [m for m in v.get("confusable_meanings", []) if m != v["meaning_ko"]][:3]
+        cm = [m for m in v.get("confusable_meanings", []) if m != v["meaning_ko"]][:9]
         await content_repo.create_problem(
             db,
             content_item_id=item.id,

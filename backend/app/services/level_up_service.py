@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+import random
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
@@ -139,6 +140,11 @@ async def _build_exam_distractors(
     if problem.type in pre_stored:
         return (problem.distractors or {}).get("options", [])
 
+    # MCQ_MEANING 선저장 distractors — 풀이 3개 초과면 랜덤 3개 선택해 시험마다 다른 조합 노출
+    if problem.type == ProblemType.MCQ_MEANING and problem.distractors:
+        opts = (problem.distractors or {}).get("options", [])
+        return random.sample(opts, 3) if len(opts) > 3 else opts
+
     if problem.type not in (ProblemType.MCQ_MEANING, ProblemType.MCQ_READING):
         return []
 
@@ -219,8 +225,6 @@ async def get_level_up_problems(
 
     if not unique:
         raise LevelUpError("레벨업 시험용 콘텐츠가 부족합니다.", code="insufficient_content")
-
-    import random
 
     random.shuffle(unique)
 

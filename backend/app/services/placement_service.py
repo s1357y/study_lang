@@ -138,9 +138,10 @@ async def _build_placement_distractors(
     if problem.type in pre_stored:
         return (problem.distractors or {}).get("options", [])
 
-    # MCQ_MEANING 선저장 distractors 우선 — pool 쿼리 불필요
+    # MCQ_MEANING 선저장 distractors — 풀이 3개 초과면 랜덤 3개 선택해 배치마다 다른 조합 노출
     if problem.type == ProblemType.MCQ_MEANING and problem.distractors:
-        return (problem.distractors or {}).get("options", [])
+        opts = (problem.distractors or {}).get("options", [])
+        return random.sample(opts, 3) if len(opts) > 3 else opts
 
     if problem.type not in (ProblemType.MCQ_MEANING, ProblemType.MCQ_READING):
         return []

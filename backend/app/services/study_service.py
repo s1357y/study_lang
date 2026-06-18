@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from uuid import UUID
@@ -76,9 +77,10 @@ def _select_distractors(
     동적 선택 유형(MCQ_MEANING·MCQ_READING)은 pool 에서 추출한다.
     MCQ_MEANING 이 선저장 distractors 를 가지면 pool 없이 바로 반환한다.
     """
-    # MCQ_MEANING 선저장 distractors 우선 — confusable_meanings 가 있는 신규 콘텐츠
+    # MCQ_MEANING 선저장 distractors — 풀이 3개 초과면 랜덤 3개 선택해 세션마다 다른 조합 노출
     if problem.type == ProblemType.MCQ_MEANING and problem.distractors:
-        return (problem.distractors or {}).get("options", [])
+        opts = (problem.distractors or {}).get("options", [])
+        return random.sample(opts, 3) if len(opts) > 3 else opts
 
     # 선저장 유형 — distractors JSONB에서 읽기
     if problem.type in _PRE_STORED_TYPES:

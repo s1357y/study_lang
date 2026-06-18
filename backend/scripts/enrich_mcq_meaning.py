@@ -1,17 +1,19 @@
 """MCQ_MEANING 오답 선택지 일괄 보강 스크립트.
 
-distractors 가 NULL 인 기존 MCQ_MEANING 문제에 confusable_meanings 를 LLM 으로 생성해 저장한다.
+distractors 가 NULL 이거나 3개 이하인 기존 MCQ_MEANING 문제에
+confusable_meanings 를 LLM 으로 생성해 저장한다.
 
 실행:
     cd backend
-    python -m scripts.enrich_mcq_meaning [--level LEVEL] [--dry-run] [--batch-size N]
+    python -m scripts.enrich_mcq_meaning [--level LEVEL] [--dry-run] [--batch-size N] [--upgrade]
 
 동작:
-    1) Problem WHERE type='mcq_meaning' AND distractors IS NULL 조회 (레벨 필터 선택)
+    1) 기본: Problem WHERE type='mcq_meaning' AND distractors IS NULL 조회
+       --upgrade: distractors IS NULL 또는 옵션 수 <= 3 인 문제도 대상에 포함
     2) 연결된 ContentItem 에서 word/reading/meaning_ko 추출
-    3) LLM 으로 confusable_meanings 3개 생성 (enrich_mcq_meaning.j2 프롬프트)
+    3) LLM 으로 confusable_meanings 6~9개 생성 (enrich_mcq_meaning.j2 프롬프트)
     4) 방어 필터 후 Problem.distractors 업데이트
-    멱등성: 이미 distractors 가 있는 행은 자동 스킵
+    멱등성: --upgrade 없이 실행 시 이미 distractors 가 있는 행은 자동 스킵
 """
 
 from __future__ import annotations
@@ -27,7 +29,7 @@ sys.path.insert(0, str(_BACKEND))
 
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound  # noqa: E402
 from pydantic import BaseModel, Field, ValidationError  # noqa: E402
-from sqlalchemy import select  # noqa: E402
+from sqlalchemy import func, or_, select  # noqa: E402
 from sqlalchemy.ext.asyncio import AsyncSession  # noqa: E402
 
 from app.core.db import SessionLocal  # noqa: E402
@@ -58,16 +60,29 @@ class EnrichOutput(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-async def _fetch_null_problems(
-    db: AsyncSession, *, level: str | None
+async def _fetch_problems(
+    db: AsyncSession, *, level: str | None, upgrade: bool
 ) -> list[tuple[Problem, ContentItem]]:
-    """distractors 가 NULL 인 MCQ_MEANING 문제와 연결된 ContentItem 을 조회한다."""
+    """보강 대상 MCQ_MEANING 문제를 조회한다.
+
+    upgrade=False: distractors IS NULL 인 문제만 (기본)
+    upgrade=True: 추가로 옵션 수 3개 이하인 문제도 포함
+    """
+    if upgrade:
+        # 3개 이하 → 6~9개로 확장 대상
+        distractor_cond = or_(
+            Problem.distractors.is_(None),
+            func.jsonb_array_length(Problem.distractors["options"]) <= 3,
+        )
+    else:
+        distractor_cond = Problem.distractors.is_(None)
+
     stmt = (
         select(Problem, ContentItem)
         .join(ContentItem, Problem.content_item_id == ContentItem.id)
         .where(
             Problem.type == ProblemType.MCQ_MEANING,
-            Problem.distractors.is_(None),
+            distractor_cond,
             ContentItem.language == "ja",
         )
     )
@@ -79,7 +94,7 @@ async def _fetch_null_problems(
 
 
 async def _generate_distractors(word: str, reading: str, meaning_ko: str) -> list[str]:
-    """LLM 으로 confusable_meanings 3개를 생성한다. 실패 시 빈 리스트 반환."""
+    """LLM 으로 confusable_meanings 6~9개를 생성한다. 실패 시 빈 리스트 반환."""
     try:
         template = _jinja_env.get_template("enrich_mcq_meaning.j2")
     except TemplateNotFound:
@@ -94,8 +109,8 @@ async def _generate_distractors(word: str, reading: str, meaning_ko: str) -> lis
         logger.warning("LLM 응답 파싱 실패: %s | word=%s", exc, word)
         return []
 
-    # 방어 필터: 정답과 동일한 항목 제거
-    filtered = [m for m in parsed.confusable_meanings if m != meaning_ko][:3]
+    # 방어 필터: 정답과 동일한 항목 제거, 최대 9개 저장
+    filtered = [m for m in parsed.confusable_meanings if m != meaning_ko][:9]
     return filtered
 
 
@@ -104,9 +119,9 @@ async def _generate_distractors(word: str, reading: str, meaning_ko: str) -> lis
 # ---------------------------------------------------------------------------
 
 
-async def run(*, level: str | None, dry_run: bool, batch_size: int) -> None:
+async def run(*, level: str | None, dry_run: bool, batch_size: int, upgrade: bool) -> None:
     async with SessionLocal() as db:
-        pairs = await _fetch_null_problems(db, level=level)
+        pairs = await _fetch_problems(db, level=level, upgrade=upgrade)
         logger.info(
             "보강 대상: %d개 (level=%s, dry_run=%s)",
             len(pairs),
@@ -175,7 +190,8 @@ def _parse_args() -> argparse.Namespace:
   cd backend
   python -m scripts.enrich_mcq_meaning --dry-run
   python -m scripts.enrich_mcq_meaning --level BEGINNER
-  python -m scripts.enrich_mcq_meaning --batch-size 5
+  python -m scripts.enrich_mcq_meaning --upgrade --dry-run
+  python -m scripts.enrich_mcq_meaning --upgrade --level BEGINNER --batch-size 5
         """,
     )
     parser.add_argument(
@@ -196,6 +212,11 @@ def _parse_args() -> argparse.Namespace:
         metavar="N",
         help="커밋 단위 (기본값: 10)",
     )
+    parser.add_argument(
+        "--upgrade",
+        action="store_true",
+        help="distractors 가 3개 이하인 기존 레코드도 보강 대상에 포함",
+    )
     return parser.parse_args()
 
 
@@ -205,4 +226,8 @@ if __name__ == "__main__":
         format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
     )
     args = _parse_args()
-    asyncio.run(run(level=args.level, dry_run=args.dry_run, batch_size=args.batch_size))
+    asyncio.run(
+        run(
+            level=args.level, dry_run=args.dry_run, batch_size=args.batch_size, upgrade=args.upgrade
+        )
+    )

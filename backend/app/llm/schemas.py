@@ -23,7 +23,7 @@ class VocabularyOutput(BaseModel):
     )
     confusable_meanings: list[str] = Field(
         default_factory=list,
-        description="MCQ_MEANING 오답용 헷갈리는 한국어 의미 3개 (같은 품사, 유사 의미 영역)",
+        description="MCQ_MEANING 오답용 헷갈리는 한국어 의미 6~9개 (같은 품사, 유사 의미 영역)",
     )
 
 
